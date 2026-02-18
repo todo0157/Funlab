@@ -51,6 +51,64 @@ export function AnalysisResult({ result, onReset }: AnalysisResultProps) {
         <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{summary}</p>
       </motion.div>
 
+      {/* Premium Upsell Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7, duration: 0.5 }}
+        className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-500 to-rose-500 rounded-2xl p-6 text-white"
+      >
+        {/* Background decoration */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+        <div className="relative">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-2 py-0.5 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full">
+              PREMIUM
+            </span>
+            <span className="text-white/80 text-sm">더 정확한 맨헤라 분석을 원하신다면?</span>
+          </div>
+
+          <h3 className="text-xl font-bold mb-3">
+            전체 대화 분석으로 진짜 맨헤라를 찾아보세요
+          </h3>
+
+          <ul className="space-y-2 mb-4 text-sm text-white/90">
+            <li className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-yellow-300 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span><strong>전체 메시지</strong> 분석 (최대 5,000개)</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-yellow-300 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span><strong>GPT-4 Turbo</strong>로 정밀 분석</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-yellow-300 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span>심야 활동, 감정 변화 <strong>상세 패턴 분석</strong></span>
+            </li>
+          </ul>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <a
+              href="https://toss.me/funlab/3900"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto px-6 py-3 bg-white text-purple-600 font-bold rounded-xl hover:bg-gray-100 transition-colors text-center shadow-lg"
+            >
+              3,900원으로 업그레이드
+            </a>
+            <span className="text-white/60 text-sm">단 한 번의 결제로 이용 가능</span>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Action buttons */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
