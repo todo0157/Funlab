@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/layout/Header';
 import { FileUploader } from './components/upload/FileUploader';
 import { AnalysisResult } from './components/analysis/AnalysisResult';
+import { TierSelector } from './components/tier/TierSelector';
 import { parseKakaoTalkChat } from './services/chatParser';
 import { analyzeMenhera } from './services/analysisService';
-import type { MenheraAnalysisResult, AnalysisState, ParsedChat } from './types/menhera';
+import type { MenheraAnalysisResult, AnalysisState, ParsedChat, AnalysisTier } from './types/menhera';
 
 // In production, use relative paths. In development, use full URLs for separate apps.
 const PORTAL_URL = import.meta.env.DEV ? 'http://localhost:3000' : '/';
@@ -24,6 +25,7 @@ function App() {
   const [analysisState, setAnalysisState] = useState<AnalysisState>('idle');
   const [result, setResult] = useState<MenheraAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [parsedChat, setParsedChat] = useState<ParsedChat | null>(null);
 
   useEffect(() => {
     if (darkMode) {
@@ -42,21 +44,35 @@ function App() {
 
     try {
       // Parse the chat
-      const parsedChat: ParsedChat = parseKakaoTalkChat(content);
+      const parsed: ParsedChat = parseKakaoTalkChat(content);
 
       // Validate parsed data - need at least 2 participants for group chat
-      if (parsedChat.participants.length < 2) {
+      if (parsed.participants.length < 2) {
         throw new Error('대화 참여자가 2명 이상이어야 해요. 단체 채팅방의 대화 파일을 업로드해주세요.');
       }
 
-      if (parsedChat.totalMessageCount < 20) {
+      if (parsed.totalMessageCount < 20) {
         throw new Error('분석하기에 메시지가 너무 적어요. 더 많은 대화가 있는 파일을 업로드해주세요.');
       }
 
-      setAnalysisState('analyzing');
+      // Store parsed chat and go to tier selection
+      setParsedChat(parsed);
+      setAnalysisState('tierSelection');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '분석 중 오류가 발생했어요');
+      setAnalysisState('error');
+    }
+  }, []);
 
-      // Call actual API
-      const analysisResult = await analyzeMenhera(parsedChat);
+  const handleTierSelect = useCallback(async (tier: AnalysisTier) => {
+    if (!parsedChat) return;
+
+    setAnalysisState('analyzing');
+    setError(null);
+
+    try {
+      // Call actual API with selected tier
+      const analysisResult = await analyzeMenhera(parsedChat, tier);
 
       setResult(analysisResult);
       setAnalysisState('complete');
@@ -64,12 +80,13 @@ function App() {
       setError(err instanceof Error ? err.message : '분석 중 오류가 발생했어요');
       setAnalysisState('error');
     }
-  }, []);
+  }, [parsedChat]);
 
   const handleReset = useCallback(() => {
     setAnalysisState('idle');
     setResult(null);
     setError(null);
+    setParsedChat(null);
   }, []);
 
   const isLoading = analysisState === 'parsing' || analysisState === 'analyzing';
@@ -80,7 +97,7 @@ function App() {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Title section */}
-        {analysisState !== 'complete' && (
+        {analysisState !== 'complete' && analysisState !== 'tierSelection' && (
           <div className="text-center mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
               <span className="bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">맨헤라</span> 분석기
@@ -112,6 +129,16 @@ function App() {
         {/* Upload section */}
         {analysisState === 'idle' && (
           <FileUploader onFileSelect={handleFileSelect} isLoading={isLoading} />
+        )}
+
+        {/* Tier selection */}
+        {analysisState === 'tierSelection' && parsedChat && (
+          <TierSelector
+            parsedChat={parsedChat}
+            onSelectTier={handleTierSelect}
+            onCancel={handleReset}
+            isLoading={isLoading}
+          />
         )}
 
         {/* Error state */}

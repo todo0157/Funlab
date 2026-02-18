@@ -1,31 +1,39 @@
-import { ParsedChat, MenheraAnalysisResult, MenheraScore } from '../types/menhera';
+import { ParsedChat, MenheraAnalysisResult, MenheraScore, AnalysisTier, TIER_INFO } from '../types/menhera';
 import { sampleMessages, formatMessagesForAPI } from './chatParser';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787';
 
 interface AnalyzeRequestBody {
+  tier: AnalysisTier;
   chatData: {
     participants: string[];
     messages: string;
     metadata: {
       totalMessages: number;
+      analyzedMessages: number;
       dateRange: string;
       messageCountBySender: Record<string, number>;
     };
   };
 }
 
-export async function analyzeMenhera(parsedChat: ParsedChat): Promise<MenheraAnalysisResult> {
-  // Sample messages to reduce token usage
-  const sampledMessages = sampleMessages(parsedChat, 300);
+export async function analyzeMenhera(
+  parsedChat: ParsedChat,
+  tier: AnalysisTier = 'free'
+): Promise<MenheraAnalysisResult> {
+  // Sample messages based on tier
+  const maxMessages = TIER_INFO[tier].maxMessages;
+  const sampledMessages = sampleMessages(parsedChat, maxMessages);
   const formattedMessages = formatMessagesForAPI(sampledMessages);
 
   const requestBody: AnalyzeRequestBody = {
+    tier,
     chatData: {
       participants: parsedChat.participants,
       messages: formattedMessages,
       metadata: {
         totalMessages: parsedChat.totalMessageCount,
+        analyzedMessages: sampledMessages.length,
         dateRange: `${parsedChat.dateRange.start.toLocaleDateString()} ~ ${parsedChat.dateRange.end.toLocaleDateString()}`,
         messageCountBySender: parsedChat.messageCountBySender,
       },

@@ -48,4 +48,36 @@ export interface MenheraAnalysisResult {
 }
 
 // Analysis state
-export type AnalysisState = 'idle' | 'parsing' | 'analyzing' | 'complete' | 'error';
+export type AnalysisState = 'idle' | 'parsing' | 'tierSelection' | 'analyzing' | 'complete' | 'error';
+
+// Analysis tier
+export type AnalysisTier = 'free' | 'premium';
+
+// Tier configuration for display
+export interface TierInfo {
+  tier: AnalysisTier;
+  name: string;
+  maxMessages: number;
+  model: string;
+  features: string[];
+  price: number | null;
+}
+
+export const TIER_INFO: Record<AnalysisTier, TierInfo> = {
+  free: {
+    tier: 'free',
+    name: '무료 분석',
+    maxMessages: 300,
+    model: 'GPT-3.5',
+    features: ['샘플 메시지 분석', '기본 맨헤라 순위', '재미있는 칭호 부여'],
+    price: null,
+  },
+  premium: {
+    tier: 'premium',
+    name: '프리미엄 분석',
+    maxMessages: 5000,
+    model: 'GPT-4 Turbo',
+    features: ['전체 메시지 분석', '정밀 맨헤라 측정', '상세 감정 패턴 분석', '심층 해석'],
+    price: 3900,
+  },
+};

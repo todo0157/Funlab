@@ -1,14 +1,16 @@
-import { ParsedChat, AnalysisResult, LoveAnalysis } from '../types/katalk';
+import { ParsedChat, AnalysisResult, LoveAnalysis, AnalysisTier, TIER_INFO } from '../types/katalk';
 import { sampleMessages, formatMessagesForAPI } from './katalkParser';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787';
 
 interface AnalyzeRequestBody {
+  tier: AnalysisTier;
   chatData: {
     participants: string[];
     messages: string;
     metadata: {
       totalMessages: number;
+      analyzedMessages: number;
       dateRange: string;
       messageCountBySender: Record<string, number>;
     };
@@ -51,17 +53,23 @@ function normalizeLoveAnalysis(love: LoveAnalysis): LoveAnalysis {
   };
 }
 
-export async function analyzeChat(parsedChat: ParsedChat): Promise<AnalysisResult> {
-  // Sample messages to reduce token usage
-  const sampledMessages = sampleMessages(parsedChat, 200);
+export async function analyzeChat(
+  parsedChat: ParsedChat,
+  tier: AnalysisTier = 'free'
+): Promise<AnalysisResult> {
+  // Sample messages based on tier
+  const maxMessages = TIER_INFO[tier].maxMessages;
+  const sampledMessages = sampleMessages(parsedChat, maxMessages);
   const formattedMessages = formatMessagesForAPI(sampledMessages);
 
   const requestBody: AnalyzeRequestBody = {
+    tier,
     chatData: {
       participants: parsedChat.participants,
       messages: formattedMessages,
       metadata: {
         totalMessages: parsedChat.totalMessageCount,
+        analyzedMessages: sampledMessages.length,
         dateRange: `${parsedChat.dateRange.start.toLocaleDateString()} ~ ${parsedChat.dateRange.end.toLocaleDateString()}`,
         messageCountBySender: parsedChat.messageCountBySender,
       },

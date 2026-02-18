@@ -3,7 +3,30 @@ interface Env {
   ENVIRONMENT: string;
 }
 
+// Tier types
+type AnalysisTier = 'free' | 'premium';
+
+interface TierConfig {
+  model: string;
+  maxTokens: number;
+  rateLimit: number;
+}
+
+const TIER_CONFIGS: Record<AnalysisTier, TierConfig> = {
+  free: {
+    model: 'gpt-3.5-turbo',
+    maxTokens: 2000,
+    rateLimit: 10,
+  },
+  premium: {
+    model: 'gpt-4-turbo',
+    maxTokens: 4000,
+    rateLimit: 5,
+  },
+};
+
 interface AnalyzeRequest {
+  tier?: AnalysisTier;
   chatData: {
     participants: string[];
     messages: string;
@@ -24,19 +47,20 @@ const corsHeaders = {
 
 // Rate limiting (simple in-memory, resets on worker restart)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 10; // requests per minute
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 
-function checkRateLimit(ip: string): boolean {
+function checkRateLimit(ip: string, tier: AnalysisTier = 'free'): boolean {
   const now = Date.now();
-  const record = rateLimitMap.get(ip);
+  const limit = TIER_CONFIGS[tier].rateLimit;
+  const key = `${ip}:${tier}`;
+  const record = rateLimitMap.get(key);
 
   if (!record || now > record.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+    rateLimitMap.set(key, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
     return true;
   }
 
-  if (record.count >= RATE_LIMIT) {
+  if (record.count >= limit) {
     return false;
   }
 
@@ -44,8 +68,15 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-// OpenAI API call with custom system prompt
-async function callOpenAI(systemPrompt: string, userPrompt: string, apiKey: string): Promise<string> {
+// OpenAI API call with custom system prompt and tier-based model selection
+async function callOpenAI(
+  systemPrompt: string,
+  userPrompt: string,
+  apiKey: string,
+  tier: AnalysisTier = 'free'
+): Promise<string> {
+  const config = TIER_CONFIGS[tier];
+
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -53,13 +84,13 @@ async function callOpenAI(systemPrompt: string, userPrompt: string, apiKey: stri
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'gpt-3.5-turbo',
+      model: config.model,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
       temperature: 0.7,
-      max_tokens: 2000,
+      max_tokens: config.maxTokens,
     }),
   });
 
@@ -240,9 +271,13 @@ export default {
     // Analyze endpoint
     if (url.pathname === '/api/analyze' && request.method === 'POST') {
       try {
-        // Rate limiting
+        // Parse request body
+        const body: AnalyzeRequest = await request.json();
+        const tier: AnalysisTier = body.tier || 'free';
+
+        // Rate limiting with tier
         const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
-        if (!checkRateLimit(clientIP)) {
+        if (!checkRateLimit(clientIP, tier)) {
           return new Response(
             JSON.stringify({ success: false, message: '요청이 너무 많아요. 잠시 후 다시 시도해주세요.' }),
             {
@@ -251,9 +286,6 @@ export default {
             }
           );
         }
-
-        // Parse request body
-        const body: AnalyzeRequest = await request.json();
 
         if (!body.chatData || !body.chatData.participants || !body.chatData.messages) {
           return new Response(
@@ -286,14 +318,15 @@ ${messages}
 분석은 반드시 한국어로 작성해주세요.
 `;
 
-        // Call OpenAI
-        const aiResponse = await callOpenAI(LOVE_ANALYSIS_PROMPT, prompt, env.OPENAI_API_KEY);
+        // Call OpenAI with tier-based model
+        const aiResponse = await callOpenAI(LOVE_ANALYSIS_PROMPT, prompt, env.OPENAI_API_KEY, tier);
         const analysisData = parseAnalysisResponse(aiResponse);
 
         return new Response(
           JSON.stringify({
             success: true,
             data: analysisData,
+            tier,
           }),
           {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -318,9 +351,13 @@ ${messages}
     // Menhera analyze endpoint
     if (url.pathname === '/api/analyze-menhera' && request.method === 'POST') {
       try {
-        // Rate limiting
+        // Parse request body
+        const body: AnalyzeRequest = await request.json();
+        const tier: AnalysisTier = body.tier || 'free';
+
+        // Rate limiting with tier
         const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
-        if (!checkRateLimit(clientIP)) {
+        if (!checkRateLimit(clientIP, tier)) {
           return new Response(
             JSON.stringify({ success: false, message: '요청이 너무 많아요. 잠시 후 다시 시도해주세요.' }),
             {
@@ -329,9 +366,6 @@ ${messages}
             }
           );
         }
-
-        // Parse request body
-        const body: AnalyzeRequest = await request.json();
 
         if (!body.chatData || !body.chatData.participants || !body.chatData.messages) {
           return new Response(
@@ -364,14 +398,15 @@ ${messages}
 재미있고 유머러스하게 분석해주세요!
 `;
 
-        // Call OpenAI
-        const aiResponse = await callOpenAI(MENHERA_ANALYSIS_PROMPT, prompt, env.OPENAI_API_KEY);
+        // Call OpenAI with tier-based model
+        const aiResponse = await callOpenAI(MENHERA_ANALYSIS_PROMPT, prompt, env.OPENAI_API_KEY, tier);
         const analysisData = parseMenheraResponse(aiResponse);
 
         return new Response(
           JSON.stringify({
             success: true,
             data: analysisData,
+            tier,
           }),
           {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
