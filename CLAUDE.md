@@ -87,10 +87,47 @@ VITE_API_URL=http://localhost:8787
 1. `git push origin main` → Cloudflare Pages 자동 빌드
 2. `cd workers/api-proxy && npx wrangler deploy` → Workers 배포
 
+## 현재 작업 상태 (2026-02-18)
+
+### MBTI 분석기 구현 진행 중 (`apps/mbti-analyzer/`)
+
+**완료된 파일:**
+- `package.json`, `vite.config.ts` (port 3003, base: '/mbti/')
+- `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`
+- `index.html`, `public/favicon.svg`
+- `src/types/mbti.ts` - 타입 정의 완료
+- `src/services/chatParser.ts` - 카톡 파싱 로직
+- `src/services/analysisService.ts` - API 호출 로직
+- `src/components/layout/Header.tsx`
+- `src/components/upload/DragDropZone.tsx`
+- `src/components/upload/FileUploader.tsx`
+
+**아직 생성 필요한 파일:**
+1. `src/components/tier/TierSelector.tsx` - 티어 선택 UI (katalk-analyzer 참고)
+2. `src/components/analysis/MBTIChart.tsx` - MBTI 4축 시각화 차트 (신규)
+3. `src/components/analysis/AnalysisResult.tsx` - 결과 화면 + 프리미엄 유도 배너
+4. `src/App.tsx` - 메인 앱 컴포넌트
+5. `src/index.css` - 스타일시트
+
+**Workers 추가 작업:**
+- `workers/api-proxy/src/index.ts`에 `/api/analyze-mbti` 엔드포인트 추가
+
+**포털 연동 작업:**
+- `apps/portal/src/components/home/ServiceGrid.tsx`에서 MBTI `isComingSoon: false`로 변경
+
+**빌드 설정:**
+- `scripts/merge-builds.js`에 mbti-analyzer 추가
+- `package.json`에 `dev:mbti` 스크립트 추가
+
+### 이후 구현 순서
+1. ✅ MBTI 대화 스타일 분석 (진행 중)
+2. ⏳ 이모티콘 성격 분석 (`/emoji`)
+3. ⏳ 관계 점수 측정 (`/relationship`)
+
 ## Coming Soon 서비스
 
 구현 예정 서비스 (ServiceGrid.tsx 참조):
-- `/mbti` - MBTI 대화 스타일 분석
+- `/mbti` - MBTI 대화 스타일 분석 (현재 구현 중)
 - `/emoji` - 이모티콘 성격 분석
 - `/relationship` - 관계 점수 측정
 
@@ -108,3 +145,15 @@ VITE_API_URL=http://localhost:8787
 - Windows 환경에서 빌드 시 메모리 이슈 가능 (`NODE_OPTIONS="--max-old-space-size=8192"`)
 - 각 앱의 `vite.config.ts`에서 `base` 경로 설정 필요
 - `_redirects` 파일로 SPA 라우팅 처리
+
+## 작업 재개 방법
+
+MBTI 분석기 구현을 계속하려면:
+```
+MBTI 분석기 구현을 이어서 진행해줘. CLAUDE.md에서 "아직 생성 필요한 파일" 목록부터 시작해.
+```
+
+참고할 기존 코드:
+- `apps/katalk-analyzer/src/components/tier/TierSelector.tsx` - 티어 선택 UI
+- `apps/katalk-analyzer/src/components/analysis/AnalysisResult.tsx` - 결과 화면
+- `apps/katalk-analyzer/src/App.tsx` - 상태 관리 패턴
