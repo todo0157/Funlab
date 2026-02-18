@@ -2,6 +2,7 @@ import { ServiceCard } from './ServiceCard';
 
 // In production, use relative paths. In development, use full URLs for separate apps.
 const KATALK_URL = import.meta.env.DEV ? 'http://localhost:3001' : '/katalk';
+const MENHERA_URL = import.meta.env.DEV ? 'http://localhost:3002' : '/menhera';
 
 const services = [
   {
@@ -18,6 +19,24 @@ const services = [
           strokeLinejoin="round"
           strokeWidth={2}
           d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'menhera',
+    title: '맨헤라 분석기',
+    description: '단체 톡방에서 누가 가장 맨헤라인지 AI가 분석해드려요. 감정 기복, 심야 활동 등을 측정!',
+    href: MENHERA_URL,
+    isNew: true,
+    gradient: 'bg-gradient-to-br from-purple-500 to-pink-500',
+    icon: (
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
     ),
