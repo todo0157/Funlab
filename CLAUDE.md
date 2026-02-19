@@ -123,7 +123,7 @@ VITE_API_URL=http://localhost:8787
 
 ### 이후 구현 순서
 1. ✅ MBTI 대화 스타일 분석 (완료)
-2. ⏳ 이모티콘 성격 분석 (`/emoji`)
+2. ❌ 이모티콘 성격 분석 (폐기 - 카톡 내보내기 시 기본 이모티콘만 지원)
 3. ⏳ 관계 점수 측정 (`/relationship`)
 
 ## Coming Soon 서비스

@@ -61,24 +61,6 @@ const services = [
     ),
   },
   {
-    id: 'emoji-analysis',
-    title: '이모티콘 성격 분석',
-    description: '자주 사용하는 이모티콘으로 당신의 숨겨진 성격을 분석해드려요.',
-    href: '/emoji',
-    isComingSoon: true,
-    gradient: 'bg-gradient-to-br from-yellow-500 to-orange-500',
-    icon: (
-      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-  },
-  {
     id: 'relationship',
     title: '관계 점수 측정',
     description: '친구, 연인, 가족과의 대화를 분석해서 관계 점수를 측정해드려요.',
