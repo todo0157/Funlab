@@ -172,7 +172,66 @@ Analyze based on:
 
 Return ONLY valid JSON, no additional text.`;
 
-const MENHERA_ANALYSIS_PROMPT = `You are an expert at analyzing group chat conversations for "menhera" (메ン헤라�) tendencies - emotional patterns that indicate attention-seeking, emotional volatility, or dramatic behavior. This is for entertainment purposes only.
+const MBTI_ANALYSIS_PROMPT = `You are an expert at analyzing conversation patterns to predict MBTI personality types. Analyze each participant's messaging style and predict their MBTI type.
+
+IMPORTANT: Return results for ALL participants in the conversation.
+
+Required JSON structure:
+{
+  "participants": [
+    {
+      "name": "participant name",
+      "mbtiType": "ENFP" (4 letters),
+      "axes": [
+        {
+          "dimension": "EI",
+          "first": { "letter": "E", "score": 65, "label": "외향형" },
+          "second": { "letter": "I", "score": 35, "label": "내향형" }
+        },
+        {
+          "dimension": "SN",
+          "first": { "letter": "S", "score": 40, "label": "감각형" },
+          "second": { "letter": "N", "score": 60, "label": "직관형" }
+        },
+        {
+          "dimension": "TF",
+          "first": { "letter": "T", "score": 30, "label": "사고형" },
+          "second": { "letter": "F", "score": 70, "label": "감정형" }
+        },
+        {
+          "dimension": "JP",
+          "first": { "letter": "J", "score": 45, "label": "판단형" },
+          "second": { "letter": "P", "score": 55, "label": "인식형" }
+        }
+      ],
+      "confidence": number (0-100, how confident the prediction is),
+      "personality": {
+        "title": "Korean personality title like 열정 넘치는 활동가",
+        "description": "2-3 sentence Korean description of their communication style",
+        "traits": ["Korean trait 1", "Korean trait 2", "Korean trait 3"]
+      }
+    }
+  ],
+  "chatStyle": {
+    "summary": "Korean summary of overall conversation dynamics between participants (2-3 sentences)",
+    "patterns": [
+      "Korean pattern observation 1",
+      "Korean pattern observation 2",
+      "Korean pattern observation 3"
+    ]
+  }
+}
+
+MBTI indicators to analyze:
+- E vs I: Message frequency, initiation, response speed, message length
+- S vs N: Concrete vs abstract language, detail focus vs big picture
+- T vs F: Logical vs emotional expressions, direct vs harmonious communication
+- J vs P: Structured messages vs spontaneous, planning vs flexibility
+
+Scores for each axis MUST sum to 100 (e.g., E:65 + I:35 = 100).
+Return ONLY valid JSON, no additional text.`;
+
+const MENHERA_ANALYSIS_PROMPT = `You are an expert at analyzing group chat conversations for "menhera" tendencies - emotional patterns that indicate attention-seeking, emotional volatility, or dramatic behavior. This is for entertainment purposes only.
 
 Analyze the conversation and return a JSON response ranking ALL participants by their "menhera score".
 
@@ -246,6 +305,24 @@ function parseMenheraResponse(content: string): unknown {
   // Basic validation
   if (!parsed.rankings || !parsed.winner || !parsed.summary) {
     throw new Error('Invalid menhera response structure');
+  }
+
+  return parsed;
+}
+
+// Parse and validate OpenAI response for MBTI analysis
+function parseMBTIResponse(content: string): unknown {
+  // Try to extract JSON from the response
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('No valid JSON found in response');
+  }
+
+  const parsed = JSON.parse(jsonMatch[0]);
+
+  // Basic validation
+  if (!parsed.participants || !parsed.chatStyle) {
+    throw new Error('Invalid MBTI response structure');
   }
 
   return parsed;
@@ -414,6 +491,86 @@ ${messages}
         );
       } catch (error) {
         console.error('Menhera analysis error:', error);
+
+        const message =
+          error instanceof Error ? error.message : '분석 중 오류가 발생했어요';
+
+        return new Response(
+          JSON.stringify({ success: false, message }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+    }
+
+    // MBTI analyze endpoint
+    if (url.pathname === '/api/analyze-mbti' && request.method === 'POST') {
+      try {
+        // Parse request body
+        const body: AnalyzeRequest = await request.json();
+        const tier: AnalysisTier = body.tier || 'free';
+
+        // Rate limiting with tier
+        const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+        if (!checkRateLimit(clientIP, tier)) {
+          return new Response(
+            JSON.stringify({ success: false, message: '요청이 너무 많아요. 잠시 후 다시 시도해주세요.' }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        if (!body.chatData || !body.chatData.participants || !body.chatData.messages) {
+          return new Response(
+            JSON.stringify({ success: false, message: 'Invalid request body' }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        const { participants, messages, metadata } = body.chatData;
+
+        // Build prompt
+        const prompt = `
+다음 카카오톡 대화를 분석해서 각 참여자의 대화 스타일 기반 MBTI를 예측해주세요.
+
+## 대화 참여자 (${participants.length}명)
+${participants.join(', ')}
+
+## 대화 메타데이터
+- 총 메시지 수: ${metadata.totalMessages}
+- 기간: ${metadata.dateRange}
+- 메시지 수 (참여자별): ${JSON.stringify(metadata.messageCountBySender)}
+
+## 대화 내용 (샘플)
+${messages}
+
+위 대화를 분석하여 각 참여자의 MBTI 유형을 예측해주세요.
+분석은 반드시 한국어로 작성해주세요.
+`;
+
+        // Call OpenAI with tier-based model
+        const aiResponse = await callOpenAI(MBTI_ANALYSIS_PROMPT, prompt, env.OPENAI_API_KEY, tier);
+        const analysisData = parseMBTIResponse(aiResponse);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: analysisData,
+            tier,
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      } catch (error) {
+        console.error('MBTI analysis error:', error);
 
         const message =
           error instanceof Error ? error.message : '분석 중 오류가 발생했어요';

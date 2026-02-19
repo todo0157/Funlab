@@ -6,6 +6,7 @@ const distDir = path.join(rootDir, 'dist');
 const portalDist = path.join(rootDir, 'apps/portal/dist');
 const katalkDist = path.join(rootDir, 'apps/katalk-analyzer/dist');
 const menheraDist = path.join(rootDir, 'apps/menhera-analyzer/dist');
+const mbtiDist = path.join(rootDir, 'apps/mbti-analyzer/dist');
 
 // Helper function to copy directory recursively
 function copyDir(src, dest) {
@@ -50,8 +51,13 @@ copyDir(katalkDist, path.join(distDir, 'katalk'));
 console.log('Copying menhera-analyzer to /menhera/');
 copyDir(menheraDist, path.join(distDir, 'menhera'));
 
+// Copy mbti-analyzer to /mbti
+console.log('Copying mbti-analyzer to /mbti/');
+copyDir(mbtiDist, path.join(distDir, 'mbti'));
+
 // Create _redirects for SPA routing
 const redirects = `
+/mbti/*     /mbti/index.html     200
 /menhera/*  /menhera/index.html  200
 /katalk/*   /katalk/index.html   200
 /*          /index.html          200

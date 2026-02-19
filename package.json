@@ -7,6 +7,7 @@
     "dev:portal": "turbo dev --filter=portal",
     "dev:katalk": "turbo dev --filter=katalk-analyzer",
     "dev:menhera": "turbo dev --filter=menhera-analyzer",
+    "dev:mbti": "turbo dev --filter=mbti-analyzer",
     "build": "turbo build",
     "build:pages": "turbo build && node scripts/merge-builds.js",
     "lint": "turbo lint",

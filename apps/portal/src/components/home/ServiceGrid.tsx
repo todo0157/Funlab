@@ -3,6 +3,7 @@ import { ServiceCard } from './ServiceCard';
 // In production, use relative paths. In development, use full URLs for separate apps.
 const KATALK_URL = import.meta.env.DEV ? 'http://localhost:3001' : '/katalk';
 const MENHERA_URL = import.meta.env.DEV ? 'http://localhost:3002' : '/menhera';
+const MBTI_URL = import.meta.env.DEV ? 'http://localhost:3003' : '/mbti';
 
 const services = [
   {
@@ -45,8 +46,8 @@ const services = [
     id: 'mbti-chat',
     title: 'MBTI 대화 스타일',
     description: '대화 패턴을 분석해서 당신의 MBTI 유형을 예측해드려요.',
-    href: '/mbti',
-    isComingSoon: true,
+    href: MBTI_URL,
+    isNew: true,
     gradient: 'bg-gradient-to-br from-purple-500 to-indigo-500',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">

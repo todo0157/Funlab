@@ -87,40 +87,42 @@ VITE_API_URL=http://localhost:8787
 1. `git push origin main` → Cloudflare Pages 자동 빌드
 2. `cd workers/api-proxy && npx wrangler deploy` → Workers 배포
 
-## 현재 작업 상태 (2026-02-18)
+## 현재 작업 상태 (2026-02-19)
 
-### MBTI 분석기 구현 진행 중 (`apps/mbti-analyzer/`)
+### 완료된 작업
+- ✅ iOS/Android 카카오톡 내보내기 파싱 지원 추가 (katalk, menhera, mbti 모두)
+- ✅ MBTI 분석기 구현 완료 (`apps/mbti-analyzer/`)
 
-**완료된 파일:**
+### MBTI 분석기 (`apps/mbti-analyzer/`) - 완료
+
+**모든 파일 완료:**
 - `package.json`, `vite.config.ts` (port 3003, base: '/mbti/')
 - `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`
 - `index.html`, `public/favicon.svg`
-- `src/types/mbti.ts` - 타입 정의 완료
-- `src/services/chatParser.ts` - 카톡 파싱 로직
-- `src/services/analysisService.ts` - API 호출 로직
+- `src/types/mbti.ts` - 타입 정의
+- `src/services/chatParser.ts` - 카톡 파싱 (iOS/Android 지원)
+- `src/services/analysisService.ts` - API 호출
 - `src/components/layout/Header.tsx`
 - `src/components/upload/DragDropZone.tsx`
 - `src/components/upload/FileUploader.tsx`
+- `src/components/tier/TierSelector.tsx` - 티어 선택 UI
+- `src/components/analysis/MBTIChart.tsx` - MBTI 4축 시각화
+- `src/components/analysis/AnalysisResult.tsx` - 결과 화면
+- `src/App.tsx` - 메인 앱
+- `src/index.css` - 스타일시트
 
-**아직 생성 필요한 파일:**
-1. `src/components/tier/TierSelector.tsx` - 티어 선택 UI (katalk-analyzer 참고)
-2. `src/components/analysis/MBTIChart.tsx` - MBTI 4축 시각화 차트 (신규)
-3. `src/components/analysis/AnalysisResult.tsx` - 결과 화면 + 프리미엄 유도 배너
-4. `src/App.tsx` - 메인 앱 컴포넌트
-5. `src/index.css` - 스타일시트
+**Workers:**
+- `/api/analyze-mbti` 엔드포인트 추가 완료
 
-**Workers 추가 작업:**
-- `workers/api-proxy/src/index.ts`에 `/api/analyze-mbti` 엔드포인트 추가
-
-**포털 연동 작업:**
-- `apps/portal/src/components/home/ServiceGrid.tsx`에서 MBTI `isComingSoon: false`로 변경
+**포털 연동:**
+- ServiceGrid에서 MBTI 서비스 활성화 완료
 
 **빌드 설정:**
-- `scripts/merge-builds.js`에 mbti-analyzer 추가
-- `package.json`에 `dev:mbti` 스크립트 추가
+- `scripts/merge-builds.js`에 mbti-analyzer 추가 완료
+- `package.json`에 `dev:mbti` 스크립트 추가 완료
 
 ### 이후 구현 순서
-1. ✅ MBTI 대화 스타일 분석 (진행 중)
+1. ✅ MBTI 대화 스타일 분석 (완료)
 2. ⏳ 이모티콘 성격 분석 (`/emoji`)
 3. ⏳ 관계 점수 측정 (`/relationship`)
 

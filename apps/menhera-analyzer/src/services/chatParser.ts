@@ -1,10 +1,25 @@
 import { ChatMessage, ParsedChat } from '../types/menhera';
 
 // KakaoTalk export file patterns
+// PC Pattern 1: [Name] [Time] Message
+// PC Pattern 2: Name, [Time] Message
+// PC Date pattern: --------------- 2024년 1월 15일 월요일 ---------------
+// iOS Date pattern: 2025년 11월 9일 일요일
+// iOS Message pattern: 2025. 11. 9. 22:07, 재혁 : 메시지
+// Android Message pattern: 2025년 4월 19일 오전 12:41, 권창한 : 메시지
+
+// PC patterns
 const DATE_PATTERN = /^-+\s*(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[가-힣]+\s*-+$/;
 const MESSAGE_PATTERN_1 = /^\[([^\]]+)\]\s*\[([^\]]+)\]\s*(.+)$/;
 const MESSAGE_PATTERN_2 = /^([^,]+),\s*\[([^\]]+)\]\s*(.+)$/;
 const TIME_PATTERN = /^(오전|오후)\s*(\d{1,2}):(\d{2})$/;
+
+// iOS patterns
+const IOS_DATE_PATTERN = /^(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*[가-힣]+요일$/;
+const IOS_MESSAGE_PATTERN = /^(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{1,2}):(\d{2}),\s*([^:]+?)\s*:\s*(.+)$/;
+
+// Android patterns
+const ANDROID_MESSAGE_PATTERN = /^(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*(오전|오후)\s*(\d{1,2}):(\d{2}),\s*([^:]+?)\s*:\s*(.+)$/;
 
 function parseTime(timeStr: string, currentDate: Date): Date {
   const match = timeStr.match(TIME_PATTERN);
@@ -23,6 +38,32 @@ function parseTime(timeStr: string, currentDate: Date): Date {
   const date = new Date(currentDate);
   date.setHours(hour, minute, 0, 0);
   return date;
+}
+
+function parseIosTimestamp(year: string, month: string, day: string, hour: string, minute: string): Date {
+  return new Date(
+    parseInt(year, 10),
+    parseInt(month, 10) - 1,
+    parseInt(day, 10),
+    parseInt(hour, 10),
+    parseInt(minute, 10)
+  );
+}
+
+function parseAndroidTimestamp(year: string, month: string, day: string, ampm: string, hour: string, minute: string): Date {
+  let h = parseInt(hour, 10);
+  if (ampm === '오후' && h !== 12) {
+    h += 12;
+  } else if (ampm === '오전' && h === 12) {
+    h = 0;
+  }
+  return new Date(
+    parseInt(year, 10),
+    parseInt(month, 10) - 1,
+    parseInt(day, 10),
+    h,
+    parseInt(minute, 10)
+  );
 }
 
 function detectMessageType(content: string): ChatMessage['messageType'] {
@@ -45,7 +86,7 @@ export function parseKakaoTalkChat(content: string): ParsedChat {
     const trimmedLine = line.trim();
     if (!trimmedLine) continue;
 
-    // Check for date line
+    // Check for PC date line (with dashes)
     const dateMatch = trimmedLine.match(DATE_PATTERN);
     if (dateMatch) {
       const [, year, month, day] = dateMatch;
@@ -57,7 +98,67 @@ export function parseKakaoTalkChat(content: string): ParsedChat {
       continue;
     }
 
-    // Try to match message patterns
+    // Check for iOS date line (without dashes)
+    const iosDateMatch = trimmedLine.match(IOS_DATE_PATTERN);
+    if (iosDateMatch) {
+      const [, year, month, day] = iosDateMatch;
+      currentDate = new Date(
+        parseInt(year, 10),
+        parseInt(month, 10) - 1,
+        parseInt(day, 10)
+      );
+      continue;
+    }
+
+    // Try Android message pattern first (has full datetime in message)
+    const androidMatch = trimmedLine.match(ANDROID_MESSAGE_PATTERN);
+    if (androidMatch) {
+      if (currentMessage) {
+        messages.push(currentMessage);
+      }
+
+      const [, year, month, day, ampm, hour, minute, sender, messageContent] = androidMatch;
+      const timestamp = parseAndroidTimestamp(year, month, day, ampm, hour, minute);
+      const messageType = detectMessageType(messageContent);
+
+      if (messageType !== 'system') {
+        participants.add(sender.trim());
+      }
+
+      currentMessage = {
+        sender: sender.trim(),
+        timestamp,
+        content: messageContent,
+        messageType,
+      };
+      continue;
+    }
+
+    // Try iOS message pattern (has full datetime in message)
+    const iosMatch = trimmedLine.match(IOS_MESSAGE_PATTERN);
+    if (iosMatch) {
+      if (currentMessage) {
+        messages.push(currentMessage);
+      }
+
+      const [, year, month, day, hour, minute, sender, messageContent] = iosMatch;
+      const timestamp = parseIosTimestamp(year, month, day, hour, minute);
+      const messageType = detectMessageType(messageContent);
+
+      if (messageType !== 'system') {
+        participants.add(sender.trim());
+      }
+
+      currentMessage = {
+        sender: sender.trim(),
+        timestamp,
+        content: messageContent,
+        messageType,
+      };
+      continue;
+    }
+
+    // Try PC message patterns
     let messageMatch = trimmedLine.match(MESSAGE_PATTERN_1);
     if (!messageMatch) {
       messageMatch = trimmedLine.match(MESSAGE_PATTERN_2);
