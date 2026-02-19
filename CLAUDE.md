@@ -14,7 +14,10 @@
 apps/
 ├── portal/              # 메인 포털 (localhost:3000)
 ├── katalk-analyzer/     # 카톡 호감도 분석기 (localhost:3001)
-└── menhera-analyzer/    # 맨헤라 분석기 (localhost:3002)
+├── menhera-analyzer/    # 맨헤라 분석기 (localhost:3002)
+├── mbti-analyzer/       # MBTI 분석기 (localhost:3003)
+├── relationship-analyzer/ # 관계 점수 분석기 (localhost:3004)
+└── mockexam-analyzer/   # 연인 모의고사 (localhost:3005)
 
 workers/
 └── api-proxy/           # Cloudflare Workers API (localhost:8787)
@@ -57,7 +60,12 @@ workers/
 ### 3. API 프록시
 - OpenAI API 호출 (CORS 우회)
 - Rate limiting: Free 10/min, Premium 5/min
-- 엔드포인트: `/api/analyze`, `/api/analyze-menhera`
+- 엔드포인트:
+  - `/api/analyze` - 호감도 분석
+  - `/api/analyze-menhera` - 맨헤라 분석
+  - `/api/analyze-mbti` - MBTI 분석
+  - `/api/analyze-relationship` - 관계 분석
+  - `/api/generate-mockexam` - 연인 모의고사 생성
 
 ## 개발 명령어
 
@@ -66,6 +74,9 @@ pnpm dev              # 전체 개발 서버
 pnpm dev:portal       # 포털만
 pnpm dev:katalk       # 카톡 분석기만
 pnpm dev:menhera      # 맨헤라 분석기만
+pnpm dev:mbti         # MBTI 분석기만
+pnpm dev:relationship # 관계 분석기만
+pnpm dev:mockexam     # 연인 모의고사만
 pnpm build:pages      # Cloudflare Pages 빌드
 pnpm type-check       # TypeScript 검사
 ```
@@ -92,46 +103,47 @@ VITE_API_URL=http://localhost:8787
 ### 완료된 작업
 - ✅ iOS/Android 카카오톡 내보내기 파싱 지원 추가 (katalk, menhera, mbti 모두)
 - ✅ MBTI 분석기 구현 완료 (`apps/mbti-analyzer/`)
+- ✅ 연인 모의고사 구현 완료 (`apps/mockexam-analyzer/`)
 
-### MBTI 분석기 (`apps/mbti-analyzer/`) - 완료
+### 연인 모의고사 (`apps/mockexam-analyzer/`) - 완료
 
-**모든 파일 완료:**
-- `package.json`, `vite.config.ts` (port 3003, base: '/mbti/')
-- `tailwind.config.js`, `postcss.config.js`, `tsconfig.json`
-- `index.html`, `public/favicon.svg`
-- `src/types/mbti.ts` - 타입 정의
-- `src/services/chatParser.ts` - 카톡 파싱 (iOS/Android 지원)
-- `src/services/analysisService.ts` - API 호출
-- `src/components/layout/Header.tsx`
-- `src/components/upload/DragDropZone.tsx`
-- `src/components/upload/FileUploader.tsx`
-- `src/components/tier/TierSelector.tsx` - 티어 선택 UI
-- `src/components/analysis/MBTIChart.tsx` - MBTI 4축 시각화
-- `src/components/analysis/AnalysisResult.tsx` - 결과 화면
-- `src/App.tsx` - 메인 앱
-- `src/index.css` - 스타일시트
+**기능:**
+- 카카오톡 대화 업로드 → AI 분석 → 퀴즈 생성 → 링크 공유
+- Free: 5문제 (GPT-3.5) / Premium: 10문제 (GPT-4-turbo)
+- URL 기반 공유 (base64 인코딩, DB 불필요)
+
+**핵심 파일:**
+- `src/types/mockexam.ts` - QuizQuestion, QuizData 타입 정의
+- `src/services/chatParser.ts` - 카톡 파싱 + 통계/행동 패턴 추출
+- `src/services/quizService.ts` - 퀴즈 생성/인코딩/공유
+- `src/components/upload/` - 파일 업로드, 대상 선택
+- `src/components/quiz/` - 퀴즈 에디터, 공유
+- `src/components/solve/` - 퀴즈 풀기, 결과
+
+**퀴즈 품질 개선:**
+- 통계 분석: 자주 쓰는 단어, 활발한 시간대, 대화 시작 비율
+- 행동 패턴 추출: 사과/애교/감정 표현, 대화 시작·끝 패턴
+- 프롬프트: 인스타 릴스/밸런스 게임 스타일, evidence 필드 필수
 
 **Workers:**
-- `/api/analyze-mbti` 엔드포인트 추가 완료
-
-**포털 연동:**
-- ServiceGrid에서 MBTI 서비스 활성화 완료
-
-**빌드 설정:**
-- `scripts/merge-builds.js`에 mbti-analyzer 추가 완료
-- `package.json`에 `dev:mbti` 스크립트 추가 완료
+- `/api/generate-mockexam` 엔드포인트 추가 완료
 
 ### 이후 구현 순서
 1. ✅ MBTI 대화 스타일 분석 (완료)
 2. ❌ 이모티콘 성격 분석 (폐기 - 카톡 내보내기 시 기본 이모티콘만 지원)
-3. ⏳ 관계 점수 측정 (`/relationship`)
+3. ✅ 연인 모의고사 (완료)
+4. ⏳ 관계 점수 측정 (`/relationship`) - 기본 구조 생성됨
 
-## Coming Soon 서비스
+## 서비스 현황
 
-구현 예정 서비스 (ServiceGrid.tsx 참조):
-- `/mbti` - MBTI 대화 스타일 분석 (현재 구현 중)
-- `/emoji` - 이모티콘 성격 분석
-- `/relationship` - 관계 점수 측정
+구현 완료:
+- `/katalk` - 카톡 호감도 분석기
+- `/menhera` - 맨헤라 분석기
+- `/mbti` - MBTI 대화 스타일 분석
+- `/mockexam` - 연인 모의고사
+
+구현 예정:
+- `/relationship` - 관계 점수 측정 (기본 구조 생성됨)
 
 ## 코드 컨벤션
 
@@ -150,12 +162,12 @@ VITE_API_URL=http://localhost:8787
 
 ## 작업 재개 방법
 
-MBTI 분석기 구현을 계속하려면:
+관계 분석기 구현을 계속하려면:
 ```
-MBTI 분석기 구현을 이어서 진행해줘. CLAUDE.md에서 "아직 생성 필요한 파일" 목록부터 시작해.
+관계 분석기 구현을 이어서 진행해줘.
 ```
 
 참고할 기존 코드:
-- `apps/katalk-analyzer/src/components/tier/TierSelector.tsx` - 티어 선택 UI
-- `apps/katalk-analyzer/src/components/analysis/AnalysisResult.tsx` - 결과 화면
-- `apps/katalk-analyzer/src/App.tsx` - 상태 관리 패턴
+- `apps/mockexam-analyzer/` - 최신 패턴 (통계/행동 패턴 추출)
+- `apps/katalk-analyzer/src/components/` - 기본 UI 컴포넌트
+- `workers/api-proxy/src/index.ts` - API 엔드포인트 패턴

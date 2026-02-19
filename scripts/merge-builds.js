@@ -7,6 +7,8 @@ const portalDist = path.join(rootDir, 'apps/portal/dist');
 const katalkDist = path.join(rootDir, 'apps/katalk-analyzer/dist');
 const menheraDist = path.join(rootDir, 'apps/menhera-analyzer/dist');
 const mbtiDist = path.join(rootDir, 'apps/mbti-analyzer/dist');
+const relationshipDist = path.join(rootDir, 'apps/relationship-analyzer/dist');
+const mockexamDist = path.join(rootDir, 'apps/mockexam-analyzer/dist');
 
 // Helper function to copy directory recursively
 function copyDir(src, dest) {
@@ -55,12 +57,22 @@ copyDir(menheraDist, path.join(distDir, 'menhera'));
 console.log('Copying mbti-analyzer to /mbti/');
 copyDir(mbtiDist, path.join(distDir, 'mbti'));
 
+// Copy relationship-analyzer to /relationship
+console.log('Copying relationship-analyzer to /relationship/');
+copyDir(relationshipDist, path.join(distDir, 'relationship'));
+
+// Copy mockexam-analyzer to /mockexam
+console.log('Copying mockexam-analyzer to /mockexam/');
+copyDir(mockexamDist, path.join(distDir, 'mockexam'));
+
 // Create _redirects for SPA routing
 const redirects = `
-/mbti/*     /mbti/index.html     200
-/menhera/*  /menhera/index.html  200
-/katalk/*   /katalk/index.html   200
-/*          /index.html          200
+/mockexam/*      /mockexam/index.html      200
+/relationship/*  /relationship/index.html  200
+/mbti/*          /mbti/index.html          200
+/menhera/*       /menhera/index.html       200
+/katalk/*        /katalk/index.html        200
+/*               /index.html               200
 `.trim();
 
 fs.writeFileSync(path.join(distDir, '_redirects'), redirects);

@@ -4,6 +4,8 @@ import { ServiceCard } from './ServiceCard';
 const KATALK_URL = import.meta.env.DEV ? 'http://localhost:3001' : '/katalk';
 const MENHERA_URL = import.meta.env.DEV ? 'http://localhost:3002' : '/menhera';
 const MBTI_URL = import.meta.env.DEV ? 'http://localhost:3003' : '/mbti';
+const RELATIONSHIP_URL = import.meta.env.DEV ? 'http://localhost:3004' : '/relationship';
+const MOCKEXAM_URL = import.meta.env.DEV ? 'http://localhost:3005' : '/mockexam';
 
 const services = [
   {
@@ -64,8 +66,8 @@ const services = [
     id: 'relationship',
     title: '관계 점수 측정',
     description: '친구, 연인, 가족과의 대화를 분석해서 관계 점수를 측정해드려요.',
-    href: '/relationship',
-    isComingSoon: true,
+    href: RELATIONSHIP_URL,
+    isNew: true,
     gradient: 'bg-gradient-to-br from-teal-500 to-cyan-500',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,6 +76,24 @@ const services = [
           strokeLinejoin="round"
           strokeWidth={2}
           d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'mockexam',
+    title: '여친/남친 모의고사',
+    description: '카톡 대화로 연인 퀴즈를 만들고 공유해보세요! 얼마나 잘 알고 있는지 테스트!',
+    href: MOCKEXAM_URL,
+    isNew: true,
+    gradient: 'bg-gradient-to-br from-pink-500 to-rose-500',
+    icon: (
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
     ),
