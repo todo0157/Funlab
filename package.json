@@ -14,6 +14,7 @@
     "dev:greenlight": "turbo dev --filter=greenlight-analyzer",
     "dev:chattype": "turbo dev --filter=chattype-analyzer",
     "dev:balance": "turbo dev --filter=balance-analyzer",
+    "dev:character": "turbo dev --filter=character-analyzer",
     "build": "turbo build",
     "build:pages": "turbo build && node scripts/merge-builds.js",
     "lint": "turbo lint",

@@ -1,7 +1,7 @@
 import { ParsedChat, QuizData, QuizQuestion, EncodedQuiz, AnalysisTier } from '../types/mockexam';
 import { sampleMessages, formatMessagesForAPI, analyzePersonStats, formatStatsForAPI, extractBehavioralPatterns, formatPatternsForAPI } from './chatParser';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787';
+const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:8787' : '';
 
 interface GenerateQuizRequestBody {
   tier: AnalysisTier;

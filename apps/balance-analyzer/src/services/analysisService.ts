@@ -1,7 +1,7 @@
 import type { BalanceGameData, BalanceQuestion, ChatMessage, TierType, PreferenceInsight } from '../types/balance';
 import { extractPreferences, getMessageStats } from './chatParser';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://api-proxy.fun-lab.workers.dev';
+const API_URL = import.meta.env.DEV ? 'http://localhost:8787' : '';
 
 interface GenerateBalanceRequest {
   messages: ChatMessage[];

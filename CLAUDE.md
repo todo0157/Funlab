@@ -21,7 +21,8 @@ apps/
 ├── bestfriend-analyzer/ # 찐친 테스트 (localhost:3006)
 ├── greenlight-analyzer/ # 그린라이트 판독기 (localhost:3007)
 ├── chattype-analyzer/   # 말투 유형 테스트 (localhost:3008)
-└── balance-analyzer/    # 밸런스게임 생성기 (localhost:3009)
+├── balance-analyzer/    # 밸런스게임 생성기 (localhost:3009)
+└── character-analyzer/  # 드라마 캐릭터 분석 (localhost:3010)
 
 workers/
 └── api-proxy/           # Cloudflare Workers API (localhost:8787)
@@ -74,6 +75,7 @@ workers/
   - `/api/analyze-greenlight` - 그린라이트 판독
   - `/api/analyze-chattype` - 말투 유형 분석
   - `/api/generate-balance` - 밸런스게임 생성
+  - `/api/analyze-character` - 드라마 캐릭터 매칭 분석
 
 ## 개발 명령어
 
@@ -121,6 +123,7 @@ VITE_API_URL=http://localhost:8787
 - ✅ 그린라이트 판독기 구현 완료 (`apps/greenlight-analyzer/`)
 - ✅ 말투 유형 테스트 구현 완료 (`apps/chattype-analyzer/`)
 - ✅ 밸런스게임 생성기 구현 완료 (`apps/balance-analyzer/`)
+- ✅ 드라마 캐릭터 분석기 구현 완료 (`apps/character-analyzer/`)
 
 ### 연인 모의고사 (`apps/mockexam-analyzer/`) - 완료
 
@@ -145,6 +148,36 @@ VITE_API_URL=http://localhost:8787
 **Workers:**
 - `/api/generate-mockexam` 엔드포인트 추가 완료
 
+### 드라마 캐릭터 분석기 (`apps/character-analyzer/`) - 완료
+
+**기능:**
+- 퀴즈 모드: 10문항 설문으로 캐릭터 매칭
+- 카톡 분석 모드: 대화 파일 업로드 → AI 분석 → 캐릭터 매칭
+- 44개 캐릭터 (15개 드라마): 오징어게임, 더글로리, 무빙, 킹덤 등
+- 8가지 특성 기반 매칭 알고리즘 (warmth, energy, directness, humor, initiative, emotion, loyalty, ambition)
+
+**핵심 파일:**
+- `src/data/characters.ts` - 44개 캐릭터 데이터
+- `src/data/quizQuestions.ts` - 10개 퀴즈 문항
+- `src/services/matchingService.ts` - 특성 유사도 계산
+- `src/services/quizService.ts` - URL 공유, 결과 복원
+
+**주요 기능:**
+- URL 기반 결과 공유 (base64 인코딩)
+- 인스타 스토리용 결과 카드 (html-to-image)
+- 특성 비교 레이더 차트 (recharts)
+- 캐릭터 도감/갤러리 (검색, 필터링)
+- 드라마별 필터링
+
+**컴포넌트 구조:**
+- `src/components/result/` - CharacterResult, TraitRadarChart, ShareCard, DramaFilter
+- `src/components/gallery/` - GalleryView, GalleryCard, CharacterDetail
+- `src/components/quiz/` - QuizQuestion, QuizProgress
+- `src/components/upload/` - FileUploader, TargetSelector
+
+**Workers:**
+- `/api/analyze-character` 엔드포인트 추가 완료
+
 ### 이후 구현 순서
 1. ✅ MBTI 대화 스타일 분석 (완료)
 2. ❌ 이모티콘 성격 분석 (폐기 - 카톡 내보내기 시 기본 이모티콘만 지원)
@@ -163,6 +196,7 @@ VITE_API_URL=http://localhost:8787
 - `/greenlight` - 그린라이트 판독기
 - `/chattype` - 말투 유형 테스트
 - `/balance` - 밸런스게임 생성기
+- `/character` - 드라마 캐릭터 분석기 (테스트/카톡 분석 모드 지원)
 
 ## 향후 콘텐츠 아이디어
 
@@ -182,11 +216,7 @@ VITE_API_URL=http://localhost:8787
 - **기능**: "올해 가장 많이 한 말", "새벽 대화 빈도" 등
 - **바이럴 포인트**: 연말 결산 스타일 공유용 카드
 
-#### 3. 대화 캐릭터 분석기 (`/character`)
-- **컨셉**: 대화 스타일을 애니/드라마 캐릭터로 매칭
-- **기능**: "당신은 ~~ 캐릭터와 비슷해요!" + 케미 조합
-
-#### 4. 싸움 패턴 분석기 (`/fight`)
+#### 3. 싸움 패턴 분석기 (`/fight`)
 - **컨셉**: 갈등 대화 패턴 분석
 - **기능**: 누가 먼저 화해하는지, 싸움 시 말투 변화, 개선 팁
 
@@ -212,12 +242,8 @@ VITE_API_URL=http://localhost:8787
 
 ## 작업 재개 방법
 
-관계 분석기 구현을 계속하려면:
-```
-관계 분석기 구현을 이어서 진행해줘.
-```
-
-참고할 기존 코드:
-- `apps/mockexam-analyzer/` - 최신 패턴 (통계/행동 패턴 추출)
+새 콘텐츠 구현 시 참고할 기존 코드:
+- `apps/character-analyzer/` - 최신 패턴 (퀴즈 + 카톡 분석 듀얼모드, 레이더차트, 갤러리)
+- `apps/mockexam-analyzer/` - URL 공유 패턴 (통계/행동 패턴 추출)
 - `apps/katalk-analyzer/src/components/` - 기본 UI 컴포넌트
 - `workers/api-proxy/src/index.ts` - API 엔드포인트 패턴

@@ -10,6 +10,7 @@ const BESTFRIEND_URL = import.meta.env.DEV ? 'http://localhost:3006' : '/bestfri
 const GREENLIGHT_URL = import.meta.env.DEV ? 'http://localhost:3007' : '/greenlight';
 const CHATTYPE_URL = import.meta.env.DEV ? 'http://localhost:3008' : '/chattype';
 const BALANCE_URL = import.meta.env.DEV ? 'http://localhost:3009' : '/balance';
+const CHARACTER_URL = import.meta.env.DEV ? 'http://localhost:3010' : '/character';
 
 const services = [
   {
@@ -170,6 +171,24 @@ const services = [
           strokeLinejoin="round"
           strokeWidth={2}
           d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'character',
+    title: '드라마 캐릭터 분석',
+    description: '나와 닮은 넷플릭스 드라마 캐릭터는? 테스트 또는 카톡 분석으로 찾아보세요!',
+    href: CHARACTER_URL,
+    isNew: true,
+    gradient: 'bg-gradient-to-br from-red-500 to-orange-500',
+    icon: (
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"
         />
       </svg>
     ),

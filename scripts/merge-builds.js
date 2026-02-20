@@ -13,6 +13,7 @@ const bestfriendDist = path.join(rootDir, 'apps/bestfriend-analyzer/dist');
 const greenlightDist = path.join(rootDir, 'apps/greenlight-analyzer/dist');
 const chattypeDist = path.join(rootDir, 'apps/chattype-analyzer/dist');
 const balanceDist = path.join(rootDir, 'apps/balance-analyzer/dist');
+const characterDist = path.join(rootDir, 'apps/character-analyzer/dist');
 
 // Helper function to copy directory recursively
 function copyDir(src, dest) {
@@ -85,8 +86,13 @@ copyDir(chattypeDist, path.join(distDir, 'chattype'));
 console.log('Copying balance-analyzer to /balance/');
 copyDir(balanceDist, path.join(distDir, 'balance'));
 
+// Copy character-analyzer to /character
+console.log('Copying character-analyzer to /character/');
+copyDir(characterDist, path.join(distDir, 'character'));
+
 // Create _redirects for SPA routing
 const redirects = `
+/character/*     /character/index.html     200
 /balance/*       /balance/index.html       200
 /chattype/*      /chattype/index.html      200
 /greenlight/*    /greenlight/index.html    200

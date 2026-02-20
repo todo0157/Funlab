@@ -7,4 +7,7 @@ export default defineConfig({
     port: 3007,
   },
   base: '/greenlight/',
+  build: {
+    outDir: 'dist',
+  },
 });

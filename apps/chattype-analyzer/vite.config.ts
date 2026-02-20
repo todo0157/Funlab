@@ -7,4 +7,7 @@ export default defineConfig({
     port: 3008,
   },
   base: '/chattype/',
+  build: {
+    outDir: 'dist',
+  },
 });

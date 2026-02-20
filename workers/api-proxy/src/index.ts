@@ -547,6 +547,60 @@ Use the provided stats to determine type:
 
 Make analysis fun and relatable! Return ONLY valid JSON.`;
 
+const CHARACTER_ANALYSIS_PROMPT = `You are an expert at analyzing conversation patterns to identify personality traits. Analyze the conversation and extract traits that can be used to match with drama characters.
+
+Return a JSON response with the following structure:
+{
+  "targetName": "분석 대상 이름",
+  "traits": {
+    "warmth": number (0-100, 다정함 vs 냉정함),
+    "energy": number (0-100, 텐션 높음 vs 차분함),
+    "directness": number (0-100, 직설적 vs 돌려말하기),
+    "humor": number (0-100, 유머러스 vs 진지함),
+    "initiative": number (0-100, 주도적 vs 수동적),
+    "emotion": number (0-100, 감정적 vs 이성적),
+    "loyalty": number (0-100, 의리/충성심),
+    "ambition": number (0-100, 야망/목표지향)
+  },
+  "analysis": "Korean analysis of the person's communication style (2-3 sentences)"
+}
+
+## TRAIT ANALYSIS GUIDE
+
+### warmth (다정함)
+- High: 많은 이모티콘, 따뜻한 말투, 관심 표현, 칭찬
+- Low: 짧은 답변, 건조한 말투, 사무적 표현
+
+### energy (에너지)
+- High: 느낌표 많이 사용, ㅋㅋㅋ, 긴 메시지, 빠른 답장
+- Low: 차분한 말투, 짧은 문장, 이모티콘 적음
+
+### directness (솔직함)
+- High: 직접적 표현, 의견 명확히 전달, 단도직입
+- Low: 완곡한 표현, "그런 것 같아", 조심스러운 말투
+
+### humor (유머)
+- High: 농담, 드립, ㅋㅋㅋ 많이 사용, 재미있는 이야기
+- Low: 진지한 대화, 업무적 대화, 감정 표현 적음
+
+### initiative (주도성)
+- High: 먼저 연락, 대화 시작, 약속 제안, 질문 많이
+- Low: 답장 위주, 수동적 대화, 짧은 답변
+
+### emotion (감정표현)
+- High: ㅠㅠ, 감정 표현, 공감 표현, 걱정/위로
+- Low: 사실 위주, 논리적 표현, 감정 절제
+
+### loyalty (의리)
+- High: 약속 지키기, 연락 꾸준히, 관심 표현, 응원
+- Low: 산발적 연락, 관심 부족, 자기 중심적
+
+### ambition (야망)
+- High: 목표 언급, 열정적 표현, 성장 지향, 계획 언급
+- Low: 현재 만족, 여유로운 말투, 무계획적
+
+Return ONLY valid JSON, no additional text.`;
+
 const BALANCE_GAME_PROMPT = `You are an expert at creating fun "Balance Game" questions based on conversation patterns. Analyze the chat and create personalized balance game questions about the person's preferences.
 
 ## CRITICAL RULES
@@ -781,6 +835,24 @@ function parseBalanceResponse(content: string): unknown {
   // Basic validation
   if (!parsed.questions || !Array.isArray(parsed.questions)) {
     throw new Error('Invalid balance response structure');
+  }
+
+  return parsed;
+}
+
+// Parse and validate OpenAI response for character analysis
+function parseCharacterResponse(content: string): unknown {
+  // Try to extract JSON from the response
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('No valid JSON found in response');
+  }
+
+  const parsed = JSON.parse(jsonMatch[0]);
+
+  // Basic validation
+  if (!parsed.traits || !parsed.targetName) {
+    throw new Error('Invalid character response structure');
   }
 
   return parsed;
@@ -1723,6 +1795,87 @@ ${messagesText}
 
         const message =
           error instanceof Error ? error.message : '밸런스게임 생성 중 오류가 발생했어요';
+
+        return new Response(
+          JSON.stringify({ error: message }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+    }
+
+    // Character analysis endpoint
+    if (url.pathname === '/api/analyze-character' && request.method === 'POST') {
+      try {
+        // Parse request body
+        const body = await request.json() as {
+          tier?: AnalysisTier;
+          targetName: string;
+          messages: string;
+          stats?: string;
+        };
+        const tier: AnalysisTier = body.tier || 'free';
+
+        // Rate limiting with tier
+        const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+        if (!checkRateLimit(clientIP, tier)) {
+          return new Response(
+            JSON.stringify({ error: '요청이 너무 많아요. 잠시 후 다시 시도해주세요.' }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        if (!body.messages || !body.targetName) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid request body' }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        // Build prompt
+        const prompt = `
+# "${body.targetName}"의 대화 스타일 분석
+
+${body.stats || '통계 데이터 없음'}
+
+## 대화 내용
+${body.messages}
+
+---
+
+## 요청사항
+위 대화를 분석하여 "${body.targetName}"님의 성격 특성을 추출해주세요.
+8가지 특성(warmth, energy, directness, humor, initiative, emotion, loyalty, ambition)을 0-100 점수로 평가해주세요.
+
+분석 시 참고:
+- 메시지 길이, 이모티콘 사용, 말투 등을 종합적으로 분석
+- 대화 시작 비율, 질문 비율 등 통계도 참고
+- 특성 점수는 50을 기준으로 높으면 해당 특성이 강함
+`;
+
+        // Call OpenAI with tier-based model
+        const aiResponse = await callOpenAI(CHARACTER_ANALYSIS_PROMPT, prompt, env.OPENAI_API_KEY, tier);
+        const analysisData = parseCharacterResponse(aiResponse);
+
+        return new Response(
+          JSON.stringify(analysisData),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      } catch (error) {
+        console.error('Character analysis error:', error);
+
+        const message =
+          error instanceof Error ? error.message : '캐릭터 분석 중 오류가 발생했어요';
 
         return new Response(
           JSON.stringify({ error: message }),

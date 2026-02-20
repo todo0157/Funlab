@@ -1,7 +1,7 @@
 import { ParsedChat, MenheraAnalysisResult, MenheraScore, AnalysisTier, TIER_INFO } from '../types/menhera';
 import { sampleMessages, formatMessagesForAPI } from './chatParser';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8787';
+const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:8787' : '';
 
 interface AnalyzeRequestBody {
   tier: AnalysisTier;
