@@ -17,7 +17,11 @@ apps/
 ├── menhera-analyzer/    # 맨헤라 분석기 (localhost:3002)
 ├── mbti-analyzer/       # MBTI 분석기 (localhost:3003)
 ├── relationship-analyzer/ # 관계 점수 분석기 (localhost:3004)
-└── mockexam-analyzer/   # 연인 모의고사 (localhost:3005)
+├── mockexam-analyzer/   # 연인 모의고사 (localhost:3005)
+├── bestfriend-analyzer/ # 찐친 테스트 (localhost:3006)
+├── greenlight-analyzer/ # 그린라이트 판독기 (localhost:3007)
+├── chattype-analyzer/   # 말투 유형 테스트 (localhost:3008)
+└── balance-analyzer/    # 밸런스게임 생성기 (localhost:3009)
 
 workers/
 └── api-proxy/           # Cloudflare Workers API (localhost:8787)
@@ -66,6 +70,10 @@ workers/
   - `/api/analyze-mbti` - MBTI 분석
   - `/api/analyze-relationship` - 관계 분석
   - `/api/generate-mockexam` - 연인 모의고사 생성
+  - `/api/generate-bestfriend` - 찐친 테스트 생성
+  - `/api/analyze-greenlight` - 그린라이트 판독
+  - `/api/analyze-chattype` - 말투 유형 분석
+  - `/api/generate-balance` - 밸런스게임 생성
 
 ## 개발 명령어
 
@@ -77,6 +85,10 @@ pnpm dev:menhera      # 맨헤라 분석기만
 pnpm dev:mbti         # MBTI 분석기만
 pnpm dev:relationship # 관계 분석기만
 pnpm dev:mockexam     # 연인 모의고사만
+pnpm dev:bestfriend   # 찐친 테스트만
+pnpm dev:greenlight   # 그린라이트 판독기만
+pnpm dev:chattype     # 말투 유형 테스트만
+pnpm dev:balance      # 밸런스게임 생성기만
 pnpm build:pages      # Cloudflare Pages 빌드
 pnpm type-check       # TypeScript 검사
 ```
@@ -98,12 +110,17 @@ VITE_API_URL=http://localhost:8787
 1. `git push origin main` → Cloudflare Pages 자동 빌드
 2. `cd workers/api-proxy && npx wrangler deploy` → Workers 배포
 
-## 현재 작업 상태 (2026-02-19)
+## 현재 작업 상태 (2026-02-20)
 
 ### 완료된 작업
 - ✅ iOS/Android 카카오톡 내보내기 파싱 지원 추가 (katalk, menhera, mbti 모두)
 - ✅ MBTI 분석기 구현 완료 (`apps/mbti-analyzer/`)
 - ✅ 연인 모의고사 구현 완료 (`apps/mockexam-analyzer/`)
+- ✅ 관계 점수 측정기 구현 완료 (`apps/relationship-analyzer/`)
+- ✅ 찐친 테스트 구현 완료 (`apps/bestfriend-analyzer/`)
+- ✅ 그린라이트 판독기 구현 완료 (`apps/greenlight-analyzer/`)
+- ✅ 말투 유형 테스트 구현 완료 (`apps/chattype-analyzer/`)
+- ✅ 밸런스게임 생성기 구현 완료 (`apps/balance-analyzer/`)
 
 ### 연인 모의고사 (`apps/mockexam-analyzer/`) - 완료
 
@@ -132,7 +149,7 @@ VITE_API_URL=http://localhost:8787
 1. ✅ MBTI 대화 스타일 분석 (완료)
 2. ❌ 이모티콘 성격 분석 (폐기 - 카톡 내보내기 시 기본 이모티콘만 지원)
 3. ✅ 연인 모의고사 (완료)
-4. ⏳ 관계 점수 측정 (`/relationship`) - 기본 구조 생성됨
+4. ✅ 관계 점수 측정 (완료)
 
 ## 서비스 현황
 
@@ -141,55 +158,35 @@ VITE_API_URL=http://localhost:8787
 - `/menhera` - 맨헤라 분석기
 - `/mbti` - MBTI 대화 스타일 분석
 - `/mockexam` - 연인 모의고사
-
-구현 예정:
-- `/relationship` - 관계 점수 측정 (기본 구조 생성됨)
+- `/relationship` - 관계 점수 측정
+- `/bestfriend` - 찐친 테스트
+- `/greenlight` - 그린라이트 판독기
+- `/chattype` - 말투 유형 테스트
+- `/balance` - 밸런스게임 생성기
 
 ## 향후 콘텐츠 아이디어
 
 ### 우선순위 높음 (바이럴성 ⭐⭐⭐⭐⭐)
 
-#### 1. 찐친 테스트 (`/bestfriend`)
-- **컨셉**: 친구가 나를 얼마나 아는지 테스트 (HolaQuiz 스타일)
-- **기능**: 대화 분석 → 나에 대한 퀴즈 자동 생성 → 링크 공유 → 점수 확인
-- **차별점**: 기존 서비스는 수동 질문 입력 → 대화 기반 자동 생성
-- **예시 문제**: "내가 자주 쓰는 말은?", "내가 화났을 때 하는 말은?"
-
-#### 2. 레드플래그/그린플래그 분석기 (`/redflag`)
-- **컨셉**: 대화에서 연인/친구의 위험 신호와 좋은 신호 분석
-- **기능**: 레드플래그 감지 (답장 지연, 단답, 부정적 표현) / 그린플래그 점수
-- **결과**: "이 대화의 레드플래그 TOP 3" 카드
-- **바이럴 포인트**: SNS에서 "레드플래그" 밈 매우 인기
-
 ### 우선순위 중간 (바이럴성 ⭐⭐⭐⭐)
 
-#### 3. 카톡 말투 유형 테스트 (`/chattype`)
-- **컨셉**: 대화 스타일을 16가지 유형으로 진단
-- **유형 예시**: "센스쟁이형", "읽씹러형", "폭풍답장형", "새벽감성형"
-- **결과**: 유형 카드 + 궁합 맞는 유형 안내
-- **바이럴 포인트**: MBTI처럼 유형 카드 공유
-
-#### 4. 대화 온도계 (`/temperature`)
+#### 1. 대화 온도계 (`/temperature`)
 - **컨셉**: 두 사람 사이의 "대화 온도" 시각화
 - **기능**: 시간대별 대화 열기 그래프, 최고 온도 순간 하이라이트
 - **시각화**: 온도계 UI + 타임라인
 
 ### 우선순위 낮음 (구현 난이도 높음)
 
-#### 5. 밸런스게임 생성기 (`/balance`)
-- **컨셉**: 대화 기반 맞춤 밸런스게임 자동 생성
-- **기능**: 대화에서 취향/선호도 추출 → "이 사람은 치킨 vs 피자?"
-
-#### 6. 대화 리포트 카드 (`/report`)
+#### 2. 대화 리포트 카드 (`/report`)
 - **컨셉**: 월간/연간 대화 통계 인포그래픽
 - **기능**: "올해 가장 많이 한 말", "새벽 대화 빈도" 등
 - **바이럴 포인트**: 연말 결산 스타일 공유용 카드
 
-#### 7. 대화 캐릭터 분석기 (`/character`)
+#### 3. 대화 캐릭터 분석기 (`/character`)
 - **컨셉**: 대화 스타일을 애니/드라마 캐릭터로 매칭
 - **기능**: "당신은 ~~ 캐릭터와 비슷해요!" + 케미 조합
 
-#### 8. 싸움 패턴 분석기 (`/fight`)
+#### 4. 싸움 패턴 분석기 (`/fight`)
 - **컨셉**: 갈등 대화 패턴 분석
 - **기능**: 누가 먼저 화해하는지, 싸움 시 말투 변화, 개선 팁
 

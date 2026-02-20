@@ -360,6 +360,245 @@ GOOD: "이 사람이 화났을 때 카톡에서 자주 보이는 표현은?" (�
 
 Return ONLY valid JSON.`;
 
+const BESTFRIEND_PROMPT = `You are an expert at creating viral "Best Friend Quiz" questions like those on Instagram Reels and TikTok. Create quiz questions about a person that their friends would enjoy answering.
+
+## CRITICAL RULES
+1. Questions MUST be based on the provided STATISTICS, BEHAVIORAL PATTERNS, and CONVERSATION data
+2. Do NOT create questions about emoticons (txt files don't preserve them)
+3. Each question should have ONE clearly correct answer from the data
+4. Make it feel like a fun HolaQuiz-style friend test, not a boring survey
+5. EVERY answer must have "evidence" - actual quotes or data from the conversation
+
+## QUESTION CATEGORIES (mix these)
+
+### 1. 말투/습관 문제 (Based on statistics)
+Use the provided "자주 쓰는 단어", "자주 쓰는 표현", "자주 쓰는 말투/어미" data
+- "이 친구가 가장 자주 쓰는 말은?"
+- "이 친구의 시그니처 말투는?"
+- "카톡에서 이 친구가 자주 쓰는 표현은?"
+
+### 2. 시간/패턴 문제 (Based on statistics)
+Use the "가장 활발한 시간대", "심야 메시지 비율", "대화 시작 비율" data
+- "이 친구가 가장 활발한 시간대는?"
+- "이 친구가 먼저 연락하는 비율은?"
+- "이 친구의 새벽 카톡 빈도는?"
+
+### 3. 반응 패턴 문제 (Based on behavioral patterns)
+Use the "사과할 때 패턴", "애교 표현 패턴", "감정 표현" data
+- "이 친구가 미안할 때 하는 말은?"
+- "이 친구가 신나면 하는 표현은?"
+- "이 친구가 힘들 때 보이는 신호는?"
+- "연락 오래 안 하면 이 친구의 첫 마디는?"
+
+### 4. 대화 습관 문제 (Based on behavioral patterns)
+Use the extracted patterns for evidence
+- "이 친구가 대화 끝낼 때 마지막 말은?"
+- "이 친구가 대화 시작할 때 첫 마디는?"
+- "이 친구의 대화 특징은?"
+
+## OUTPUT FORMAT
+{
+  "questions": [
+    {
+      "question": "재미있고 구체적인 한국어 질문",
+      "options": ["선택지1", "선택지2", "선택지3", "선택지4"],
+      "correctAnswer": 0,
+      "explanation": "대화에서 확인된 근거",
+      "evidence": "실제 대화 인용 또는 통계 데이터"
+    }
+  ]
+}
+
+## EVIDENCE EXAMPLES
+- 통계 기반: "통계에서 '진짜' 단어 52회 사용 확인"
+- 패턴 기반: "대화 시작 패턴에서 '야' 표현 5회 발견"
+- 대화 기반: "실제 대화: '야 뭐해ㅋㅋ'"
+
+## QUALITY CHECKLIST
+- All 4 options should be plausible and similar length
+- Correct answer must be verifiable from data with evidence
+- Questions should be fun and shareable
+- Use natural, casual Korean (not formal)
+- Make options specific, not generic
+- Focus on friend-appropriate content (habits, speech patterns, behavior)
+
+Return ONLY valid JSON.`;
+
+const GREENLIGHT_ANALYSIS_PROMPT = `You are an expert at analyzing conversations to detect romantic interest signals. Analyze the conversation and identify "green lights" (positive interest signals) and "red flags" (warning signs or lack of interest).
+
+## ANALYSIS FOCUS
+Look for signals that indicate:
+- GREEN LIGHTS: Interest, engagement, effort, consistency, initiative
+- RED FLAGS: Disinterest, avoidance, one-sided effort, inconsistency
+
+## Required JSON structure
+{
+  "overallScore": number (0-100, where 100 is strong green light),
+  "verdict": "strong_greenlight" | "greenlight" | "neutral" | "redflag" | "strong_redflag",
+  "verdictMessage": "Korean verdict message (e.g., '완전 그린라이트! 지금 당장 고백하세요!')",
+  "greenlights": [
+    {
+      "type": "greenlight",
+      "title": "Korean title (e.g., '먼저 연락하는 적극성')",
+      "description": "Korean description of this green light signal",
+      "evidence": "Actual quote or specific data from conversation",
+      "severity": number (1-5, how strong this signal is)
+    }
+  ],
+  "redflags": [
+    {
+      "type": "redflag",
+      "title": "Korean title (e.g., '답장 속도 느림')",
+      "description": "Korean description of this red flag",
+      "evidence": "Actual quote or specific data from conversation",
+      "severity": number (1-5, how concerning this signal is)
+    }
+  ],
+  "advice": "Korean advice for the user (3-4 sentences, warm and helpful tone)",
+  "targetName": "Name of the person being analyzed"
+}
+
+## GREEN LIGHT INDICATORS
+- 먼저 연락하기 (initiating conversations)
+- 빠른 답장 (quick responses)
+- 긴 메시지 (detailed messages)
+- 질문 많이 하기 (asking questions about you)
+- 이모티콘/ㅋㅋ 많이 사용 (emotional expressions)
+- 심야 대화 참여 (late night chats)
+- 약속/만남 제안 (suggesting meetups)
+- 칭찬/관심 표현 (compliments, interest)
+- 일상 공유 (sharing daily life)
+
+## RED FLAG INDICATORS
+- 답장 늦음 (slow responses)
+- 단답 (short replies)
+- 대화 끊기 (ending conversations)
+- 질문 안 함 (not asking questions)
+- 감정 표현 부재 (lack of emotional expression)
+- 약속 회피 (avoiding meetups)
+- 읽씹 (read but no reply patterns)
+- 다른 사람 언급 (mentioning others romantically)
+
+## VERDICT CRITERIA
+- strong_greenlight (80-100): 확실한 호감, 적극적 신호
+- greenlight (60-79): 긍정적 신호, 관심 있음
+- neutral (40-59): 판단 보류, 더 관찰 필요
+- redflag (20-39): 부정적 신호, 관심 적음
+- strong_redflag (0-19): 확실한 무관심, 경고 신호
+
+Return ONLY valid JSON. Make analysis fun but insightful!`;
+
+const CHATTYPE_ANALYSIS_PROMPT = `You are an expert at analyzing chat conversation styles. Analyze the person's messaging patterns and categorize them into one of 16 chat types.
+
+## 16 CHAT TYPES (typeCode)
+- LIGHTNING: 폭풍 답장러 (super fast replier)
+- GHOST: 읽씹 마스터 (slow/no reply)
+- EMOJI_BOMB: 이모티콘 폭격기 (emoji heavy)
+- MINIMALIST: 단답 장인 (short replies)
+- NOVELIST: 장문 소설가 (long messages)
+- NIGHT_OWL: 새벽 감성러 (late night active)
+- MORNING_BIRD: 아침형 인간 (morning active)
+- QUESTION_MARK: 질문 폭격기 (lots of questions)
+- MOOD_MAKER: 분위기 메이커 (humor, energy)
+- TSUNDERE: 츤데레형 (cold but caring)
+- AEGYO_MASTER: 애교 만렙 (cute expressions)
+- COOL_GUY: 쿨한 도시남녀 (calm, minimal emotion)
+- ENERGY_BOMB: 텐션 폭발형 (high energy, exclamations)
+- CHILL_VIBES: 느긋한 힐러 (relaxed, slow)
+- DETECTIVE: 반응 탐정 (analytical, observant)
+- CHAMELEON: 카멜레온형 (adapts to others)
+
+## Required JSON structure
+{
+  "typeCode": "LIGHTNING" (one of the 16 codes above),
+  "targetName": "분석 대상 이름",
+  "scores": {
+    "responseSpeed": number (0-100),
+    "messageLength": number (0-100),
+    "emotionExpression": number (0-100),
+    "activityTime": number (0-100),
+    "conversationStyle": number (0-100)
+  },
+  "details": [
+    {
+      "title": "Korean detail title",
+      "description": "Korean description of this aspect"
+    }
+  ],
+  "tips": [
+    "Korean communication tip 1",
+    "Korean communication tip 2",
+    "Korean communication tip 3"
+  ]
+}
+
+## TYPE SELECTION CRITERIA
+Use the provided stats to determine type:
+- Fast response + many messages → LIGHTNING
+- Slow response + few messages → GHOST
+- High emoji rate → EMOJI_BOMB
+- Short avg length + low emoji → MINIMALIST
+- Long avg length → NOVELIST
+- High late night rate → NIGHT_OWL
+- Low late night rate + morning activity → MORNING_BIRD
+- High question rate → QUESTION_MARK
+- High exclamation + emoji + energy → MOOD_MAKER or ENERGY_BOMB
+- Mix of styles → CHAMELEON
+
+Make analysis fun and relatable! Return ONLY valid JSON.`;
+
+const BALANCE_GAME_PROMPT = `You are an expert at creating fun "Balance Game" questions based on conversation patterns. Analyze the chat and create personalized balance game questions about the person's preferences.
+
+## CRITICAL RULES
+1. Questions MUST be based on actual preferences shown in conversations
+2. Each question should have ONE clearly correct answer based on the data
+3. Create questions that are fun to share and play
+4. Use the provided statistics and preferences data
+5. EVERY answer must have "evidence" - actual quotes or data
+
+## QUESTION CATEGORIES (mix these)
+
+### 1. 음식 취향 (Food preferences)
+- "이 사람이 더 좋아하는 건?" (치킨 vs 피자)
+- "이 사람이 배고플 때 먼저 떠올리는 건?"
+
+### 2. 라이프스타일 (Lifestyle)
+- "이 사람이 더 선호하는 시간대는?" (아침 vs 밤)
+- "주말에 이 사람이 더 좋아하는 건?" (집순이 vs 밖순이)
+
+### 3. 관계/소통 (Communication style)
+- "이 사람이 더 자주 하는 건?" (먼저 연락 vs 기다리기)
+- "이 사람이 화났을 때 스타일은?" (직접 말하기 vs 돌려 말하기)
+
+### 4. 성격/취향 (Personality)
+- "이 사람에게 더 어울리는 건?"
+- "이 사람이 더 공감하는 건?"
+
+## OUTPUT FORMAT
+{
+  "questions": [
+    {
+      "id": "unique_id",
+      "question": "재미있는 한국어 질문",
+      "optionA": "선택지 A",
+      "optionB": "선택지 B",
+      "answer": "A" or "B",
+      "evidence": "실제 대화 인용 또는 통계 데이터",
+      "difficulty": "easy" | "medium" | "hard",
+      "category": "음식" | "여행" | "취미" | "라이프스타일" | "성격" | "관계"
+    }
+  ]
+}
+
+## QUALITY CHECKLIST
+- Options should be genuinely balanced and interesting
+- Answer must be verifiable from data
+- Questions should be fun to share
+- Use natural, casual Korean
+- Include actual evidence
+
+Return ONLY valid JSON.`;
+
 const MENHERA_ANALYSIS_PROMPT = `You are an expert at analyzing group chat conversations for "menhera" tendencies - emotional patterns that indicate attention-seeking, emotional volatility, or dramatic behavior. This is for entertainment purposes only.
 
 Analyze the conversation and return a JSON response ranking ALL participants by their "menhera score".
@@ -488,6 +727,60 @@ function parseMockexamResponse(content: string): unknown {
   // Basic validation
   if (!parsed.questions || !Array.isArray(parsed.questions)) {
     throw new Error('Invalid mockexam response structure');
+  }
+
+  return parsed;
+}
+
+// Parse and validate OpenAI response for greenlight analysis
+function parseGreenlightResponse(content: string): unknown {
+  // Try to extract JSON from the response
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('No valid JSON found in response');
+  }
+
+  const parsed = JSON.parse(jsonMatch[0]);
+
+  // Basic validation
+  if (parsed.overallScore === undefined || !parsed.verdict || !parsed.greenlights || !parsed.redflags) {
+    throw new Error('Invalid greenlight response structure');
+  }
+
+  return parsed;
+}
+
+// Parse and validate OpenAI response for chattype analysis
+function parseChatTypeResponse(content: string): unknown {
+  // Try to extract JSON from the response
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('No valid JSON found in response');
+  }
+
+  const parsed = JSON.parse(jsonMatch[0]);
+
+  // Basic validation
+  if (!parsed.typeCode || !parsed.scores || !parsed.details) {
+    throw new Error('Invalid chattype response structure');
+  }
+
+  return parsed;
+}
+
+// Parse and validate OpenAI response for balance game
+function parseBalanceResponse(content: string): unknown {
+  // Try to extract JSON from the response
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('No valid JSON found in response');
+  }
+
+  const parsed = JSON.parse(jsonMatch[0]);
+
+  // Basic validation
+  if (!parsed.questions || !Array.isArray(parsed.questions)) {
+    throw new Error('Invalid balance response structure');
   }
 
   return parsed;
@@ -954,6 +1247,485 @@ ${messages}
 
         return new Response(
           JSON.stringify({ success: false, message }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+    }
+
+    // Bestfriend quiz generate endpoint
+    if (url.pathname === '/api/generate-bestfriend' && request.method === 'POST') {
+      try {
+        // Parse request body
+        const body = await request.json() as {
+          tier?: AnalysisTier;
+          targetName: string;
+          chatData: {
+            participants: string[];
+            messages: string;
+            targetStats?: string;
+            behavioralPatterns?: string;
+            metadata: {
+              totalMessages: number;
+              analyzedMessages: number;
+              dateRange: string;
+              messageCountBySender: Record<string, number>;
+            };
+          };
+        };
+        const tier: AnalysisTier = body.tier || 'free';
+        const questionCount = tier === 'free' ? 5 : 10;
+
+        // Rate limiting with tier
+        const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+        if (!checkRateLimit(clientIP, tier)) {
+          return new Response(
+            JSON.stringify({ success: false, message: '요청이 너무 많아요. 잠시 후 다시 시도해주세요.' }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        if (!body.chatData || !body.targetName || !body.chatData.messages) {
+          return new Response(
+            JSON.stringify({ success: false, message: 'Invalid request body' }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        const { participants, messages, targetStats, behavioralPatterns, metadata } = body.chatData;
+
+        // Build prompt with statistics and behavioral patterns
+        const prompt = `
+# "${body.targetName}" 찐친 테스트 만들기
+
+## 퀴즈 대상
+${body.targetName}
+
+## 대화 참여자
+${participants.join(', ')}
+
+## 대화 기간
+${metadata.dateRange}
+
+---
+
+${targetStats || '통계 데이터 없음'}
+
+---
+
+${behavioralPatterns || '행동 패턴 데이터 없음'}
+
+---
+
+## 대화 내용 (샘플 ${metadata.analyzedMessages}개 / 전체 ${metadata.totalMessages}개)
+${messages}
+
+---
+
+## 요청사항
+위 통계, 행동 패턴, 대화를 바탕으로 "${body.targetName}"에 대한 찐친 테스트 ${questionCount}문제를 만들어주세요.
+
+### 문제 구성 가이드
+1. **통계 기반 문제 (${Math.ceil(questionCount * 0.4)}개)**: 위 통계 데이터를 활용한 객관적 문제
+   - 자주 쓰는 단어/표현 문제
+   - 활발한 시간대 문제
+   - 대화 시작 비율 문제
+
+2. **행동 패턴 문제 (${Math.ceil(questionCount * 0.3)}개)**: 추출된 행동 패턴 활용
+   - 대화할 때 습관
+   - 감정 표현 패턴
+   - 대화 시작/끝 패턴
+
+3. **친구 케미 문제 (${Math.ceil(questionCount * 0.3)}개)**: HolaQuiz 스타일
+   - 특이한 말버릇
+   - 자주 하는 말
+   - 대화 스타일
+
+### 주의사항
+- 이모티콘 관련 문제 만들지 말 것
+- 정답은 반드시 통계나 패턴 데이터에서 확인 가능해야 함
+- "evidence" 필드에 실제 근거 데이터(대화 인용 또는 통계 수치) 포함 필수
+- 친구 사이에 공유하기 좋은 재미있는 문제로!
+`;
+
+        // Call OpenAI with tier-based model
+        const aiResponse = await callOpenAI(BESTFRIEND_PROMPT, prompt, env.OPENAI_API_KEY, tier);
+        const quizData = parseMockexamResponse(aiResponse);
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: quizData,
+            tier,
+          }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      } catch (error) {
+        console.error('Bestfriend quiz generation error:', error);
+
+        const message =
+          error instanceof Error ? error.message : '퀴즈 생성 중 오류가 발생했어요';
+
+        return new Response(
+          JSON.stringify({ success: false, message }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+    }
+
+    // Greenlight analysis endpoint
+    if (url.pathname === '/api/analyze-greenlight' && request.method === 'POST') {
+      try {
+        // Parse request body
+        const body = await request.json() as {
+          tier?: AnalysisTier;
+          targetName: string;
+          messages: string;
+          stats?: {
+            messageCount: number;
+            avgResponseTime: number;
+            shortReplyRate: number;
+            initiationRate: number;
+            emojiRate: number;
+            questionRate: number;
+            lateNightRate: number;
+          };
+        };
+        const tier: AnalysisTier = body.tier || 'free';
+
+        // Rate limiting with tier
+        const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+        if (!checkRateLimit(clientIP, tier)) {
+          return new Response(
+            JSON.stringify({ error: '요청이 너무 많아요. 잠시 후 다시 시도해주세요.' }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        if (!body.messages || !body.targetName) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid request body' }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        // Build prompt with statistics
+        const statsInfo = body.stats
+          ? `
+## ${body.targetName}의 대화 통계
+- 메시지 수: ${body.stats.messageCount}개
+- 평균 답장 시간: ${body.stats.avgResponseTime}분
+- 단답 비율: ${body.stats.shortReplyRate}%
+- 대화 시작 비율: ${body.stats.initiationRate}%
+- 이모티콘 사용률: ${body.stats.emojiRate}%
+- 질문 비율: ${body.stats.questionRate}%
+- 심야 메시지 비율: ${body.stats.lateNightRate}%
+`
+          : '';
+
+        const prompt = `
+# "${body.targetName}"의 그린라이트 분석
+
+${statsInfo}
+
+## 대화 내용
+${body.messages}
+
+---
+
+## 요청사항
+위 대화와 통계를 바탕으로 "${body.targetName}"님의 그린라이트/레드플래그 신호를 분석해주세요.
+
+분석 포인트:
+1. 답장 패턴과 속도
+2. 대화 시작/유지 의지
+3. 감정 표현 정도
+4. 질문 빈도 (상대에 대한 관심)
+5. 긴 메시지 vs 단답
+6. 시간대 (심야 대화 = 편안함)
+7. 약속/만남 관련 언급
+
+그린라이트 TOP ${tier === 'premium' ? 5 : 3}개, 레드플래그 TOP ${tier === 'premium' ? 5 : 3}개를 찾아주세요.
+재미있고 공감되게 분석해주세요!
+`;
+
+        // Call OpenAI with tier-based model
+        const aiResponse = await callOpenAI(GREENLIGHT_ANALYSIS_PROMPT, prompt, env.OPENAI_API_KEY, tier);
+        const analysisData = parseGreenlightResponse(aiResponse);
+
+        return new Response(
+          JSON.stringify(analysisData),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      } catch (error) {
+        console.error('Greenlight analysis error:', error);
+
+        const message =
+          error instanceof Error ? error.message : '분석 중 오류가 발생했어요';
+
+        return new Response(
+          JSON.stringify({ error: message }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+    }
+
+    // Chat type analysis endpoint
+    if (url.pathname === '/api/analyze-chattype' && request.method === 'POST') {
+      try {
+        // Parse request body
+        const body = await request.json() as {
+          tier?: AnalysisTier;
+          targetName: string;
+          messages: string;
+          stats?: {
+            messageCount: number;
+            avgMessageLength: number;
+            responseSpeed: string;
+            emojiRate: number;
+            questionRate: number;
+            exclamationRate: number;
+            lateNightRate: number;
+            initiationRate: number;
+            shortReplyRate: number;
+            longReplyRate: number;
+          };
+        };
+        const tier: AnalysisTier = body.tier || 'free';
+
+        // Rate limiting with tier
+        const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+        if (!checkRateLimit(clientIP, tier)) {
+          return new Response(
+            JSON.stringify({ error: '요청이 너무 많아요. 잠시 후 다시 시도해주세요.' }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        if (!body.messages || !body.targetName) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid request body' }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        // Build prompt with statistics
+        const statsInfo = body.stats
+          ? `
+## ${body.targetName}의 대화 통계
+- 메시지 수: ${body.stats.messageCount}개
+- 평균 메시지 길이: ${body.stats.avgMessageLength}자
+- 답장 속도: ${body.stats.responseSpeed}
+- 이모티콘 사용률: ${body.stats.emojiRate}%
+- 질문 비율: ${body.stats.questionRate}%
+- 느낌표 비율: ${body.stats.exclamationRate}%
+- 심야 메시지 비율: ${body.stats.lateNightRate}%
+- 대화 시작 비율: ${body.stats.initiationRate}%
+- 단답 비율: ${body.stats.shortReplyRate}%
+- 장문 비율: ${body.stats.longReplyRate}%
+`
+          : '';
+
+        const prompt = `
+# "${body.targetName}"의 카톡 말투 유형 분석
+
+${statsInfo}
+
+## 대화 내용
+${body.messages}
+
+---
+
+## 요청사항
+위 대화와 통계를 바탕으로 "${body.targetName}"님의 카톡 말투 유형을 16가지 중 하나로 분류해주세요.
+
+분석 포인트:
+1. 답장 속도 패턴
+2. 메시지 길이 특성
+3. 이모티콘/감정 표현 정도
+4. 활동 시간대
+5. 대화 스타일 (질문형/서술형/공감형 등)
+
+재미있고 공감되게 분석해주세요!
+`;
+
+        // Call OpenAI with tier-based model
+        const aiResponse = await callOpenAI(CHATTYPE_ANALYSIS_PROMPT, prompt, env.OPENAI_API_KEY, tier);
+        const analysisData = parseChatTypeResponse(aiResponse);
+
+        return new Response(
+          JSON.stringify(analysisData),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      } catch (error) {
+        console.error('Chat type analysis error:', error);
+
+        const message =
+          error instanceof Error ? error.message : '분석 중 오류가 발생했어요';
+
+        return new Response(
+          JSON.stringify({ error: message }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+    }
+
+    // Balance game generate endpoint
+    if (url.pathname === '/api/generate-balance' && request.method === 'POST') {
+      try {
+        // Parse request body
+        const body = await request.json() as {
+          tier?: AnalysisTier;
+          targetName: string;
+          messages: Array<{
+            sender: string;
+            message: string;
+            timestamp: string;
+          }>;
+          preferences?: Array<{
+            category: string;
+            preferences: string[];
+            examples: string[];
+          }>;
+          stats?: {
+            totalMessages: number;
+            topWords: string[];
+            avgLength: number;
+          };
+        };
+        const tier: AnalysisTier = body.tier || 'free';
+        const questionCount = tier === 'free' ? 5 : 10;
+
+        // Rate limiting with tier
+        const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+        if (!checkRateLimit(clientIP, tier)) {
+          return new Response(
+            JSON.stringify({ error: '요청이 너무 많아요. 잠시 후 다시 시도해주세요.' }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        if (!body.messages || !body.targetName) {
+          return new Response(
+            JSON.stringify({ error: 'Invalid request body' }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+
+        // Format messages for prompt
+        const messagesText = body.messages
+          .map((m) => `[${m.sender}] ${m.message}`)
+          .join('\n');
+
+        // Build preferences info
+        const preferencesInfo = body.preferences
+          ? `
+## ${body.targetName}의 취향 키워드
+${body.preferences.map((p) => `- ${p.category}: ${p.preferences.join(', ')}`).join('\n')}
+`
+          : '';
+
+        // Build stats info
+        const statsInfo = body.stats
+          ? `
+## ${body.targetName}의 대화 통계
+- 총 메시지 수: ${body.stats.totalMessages}개
+- 평균 메시지 길이: ${body.stats.avgLength}자
+- 자주 쓰는 단어: ${body.stats.topWords.slice(0, 10).join(', ')}
+`
+          : '';
+
+        const prompt = `
+# "${body.targetName}"의 밸런스게임 만들기
+
+${statsInfo}
+
+${preferencesInfo}
+
+## 대화 내용
+${messagesText}
+
+---
+
+## 요청사항
+위 대화와 통계를 바탕으로 "${body.targetName}"님의 취향을 맞추는 밸런스게임 ${questionCount}문제를 만들어주세요.
+
+### 문제 구성 가이드
+1. **취향 기반 문제 (${Math.ceil(questionCount * 0.4)}개)**: 대화에서 드러난 음식, 취미, 여행 취향
+2. **성격 기반 문제 (${Math.ceil(questionCount * 0.3)}개)**: 대화 스타일에서 드러난 성격
+3. **라이프스타일 문제 (${Math.ceil(questionCount * 0.3)}개)**: 대화 패턴에서 드러난 생활 방식
+
+### 주의사항
+- 각 질문은 A vs B 선택지로 명확하게
+- 정답은 반드시 대화 내용에서 확인 가능해야 함
+- "evidence" 필드에 실제 근거(대화 인용) 포함 필수
+- 재미있고 공유하고 싶은 문제로!
+
+### 난이도 분배
+- easy: ${Math.ceil(questionCount * 0.4)}개 (대화에서 명확히 드러난 취향)
+- medium: ${Math.ceil(questionCount * 0.3)}개 (약간 추론이 필요)
+- hard: ${Math.ceil(questionCount * 0.3)}개 (세심한 관찰 필요)
+`;
+
+        // Call OpenAI with tier-based model
+        const aiResponse = await callOpenAI(BALANCE_GAME_PROMPT, prompt, env.OPENAI_API_KEY, tier);
+        const gameData = parseBalanceResponse(aiResponse);
+
+        return new Response(
+          JSON.stringify(gameData),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      } catch (error) {
+        console.error('Balance game generation error:', error);
+
+        const message =
+          error instanceof Error ? error.message : '밸런스게임 생성 중 오류가 발생했어요';
+
+        return new Response(
+          JSON.stringify({ error: message }),
           {
             status: 500,
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },

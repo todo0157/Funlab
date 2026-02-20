@@ -9,6 +9,10 @@ const menheraDist = path.join(rootDir, 'apps/menhera-analyzer/dist');
 const mbtiDist = path.join(rootDir, 'apps/mbti-analyzer/dist');
 const relationshipDist = path.join(rootDir, 'apps/relationship-analyzer/dist');
 const mockexamDist = path.join(rootDir, 'apps/mockexam-analyzer/dist');
+const bestfriendDist = path.join(rootDir, 'apps/bestfriend-analyzer/dist');
+const greenlightDist = path.join(rootDir, 'apps/greenlight-analyzer/dist');
+const chattypeDist = path.join(rootDir, 'apps/chattype-analyzer/dist');
+const balanceDist = path.join(rootDir, 'apps/balance-analyzer/dist');
 
 // Helper function to copy directory recursively
 function copyDir(src, dest) {
@@ -65,8 +69,28 @@ copyDir(relationshipDist, path.join(distDir, 'relationship'));
 console.log('Copying mockexam-analyzer to /mockexam/');
 copyDir(mockexamDist, path.join(distDir, 'mockexam'));
 
+// Copy bestfriend-analyzer to /bestfriend
+console.log('Copying bestfriend-analyzer to /bestfriend/');
+copyDir(bestfriendDist, path.join(distDir, 'bestfriend'));
+
+// Copy greenlight-analyzer to /greenlight
+console.log('Copying greenlight-analyzer to /greenlight/');
+copyDir(greenlightDist, path.join(distDir, 'greenlight'));
+
+// Copy chattype-analyzer to /chattype
+console.log('Copying chattype-analyzer to /chattype/');
+copyDir(chattypeDist, path.join(distDir, 'chattype'));
+
+// Copy balance-analyzer to /balance
+console.log('Copying balance-analyzer to /balance/');
+copyDir(balanceDist, path.join(distDir, 'balance'));
+
 // Create _redirects for SPA routing
 const redirects = `
+/balance/*       /balance/index.html       200
+/chattype/*      /chattype/index.html      200
+/greenlight/*    /greenlight/index.html    200
+/bestfriend/*    /bestfriend/index.html    200
 /mockexam/*      /mockexam/index.html      200
 /relationship/*  /relationship/index.html  200
 /mbti/*          /mbti/index.html          200

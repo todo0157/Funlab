@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .gradient-text {
+    @apply bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent;
+  }
+}
+
+@layer utilities {
+  .pulse-icon {
+    animation: pulse-icon 2s ease-in-out infinite;
+  }
+
+  .pulse-ring {
+    animation: pulse-ring 2s ease-out infinite;
+  }
+
+  @keyframes pulse-icon {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1.5);
+      opacity: 0;
+    }
+  }
+}

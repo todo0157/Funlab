@@ -68,7 +68,7 @@ export function MetricsChart({ participants, delay = 0 }: MetricsChartProps) {
         <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
           <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">참여자별 특성</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {participants.map((participant, idx) => (
+            {participants.map((participant) => (
               <div
                 key={participant.name}
                 className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4"

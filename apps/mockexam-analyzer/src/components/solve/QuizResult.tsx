@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { QuizData, QuizResult as QuizResultType } from '../../types/mockexam';
-import { getScoreGrade, shareToKakao } from '../../services/quizService';
+import { getScoreGrade } from '../../services/quizService';
 
 interface QuizResultProps {
   quizData: QuizData;

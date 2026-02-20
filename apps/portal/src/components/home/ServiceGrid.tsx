@@ -6,6 +6,10 @@ const MENHERA_URL = import.meta.env.DEV ? 'http://localhost:3002' : '/menhera';
 const MBTI_URL = import.meta.env.DEV ? 'http://localhost:3003' : '/mbti';
 const RELATIONSHIP_URL = import.meta.env.DEV ? 'http://localhost:3004' : '/relationship';
 const MOCKEXAM_URL = import.meta.env.DEV ? 'http://localhost:3005' : '/mockexam';
+const BESTFRIEND_URL = import.meta.env.DEV ? 'http://localhost:3006' : '/bestfriend';
+const GREENLIGHT_URL = import.meta.env.DEV ? 'http://localhost:3007' : '/greenlight';
+const CHATTYPE_URL = import.meta.env.DEV ? 'http://localhost:3008' : '/chattype';
+const BALANCE_URL = import.meta.env.DEV ? 'http://localhost:3009' : '/balance';
 
 const services = [
   {
@@ -98,6 +102,78 @@ const services = [
       </svg>
     ),
   },
+  {
+    id: 'bestfriend',
+    title: '찐친 테스트',
+    description: '친구가 나를 얼마나 아는지 테스트! 대화 기반으로 퀴즈를 자동 생성해요.',
+    href: BESTFRIEND_URL,
+    isNew: true,
+    gradient: 'bg-gradient-to-br from-violet-500 to-indigo-500',
+    icon: (
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'greenlight',
+    title: '그린라이트 판독기',
+    description: '카톡 대화에서 그린라이트와 레드플래그를 분석해드려요! 썸남썸녀의 신호를 확인하세요.',
+    href: GREENLIGHT_URL,
+    isNew: true,
+    gradient: 'bg-gradient-to-br from-green-500 to-emerald-500',
+    icon: (
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'chattype',
+    title: '말투 유형 테스트',
+    description: '대화 스타일을 16가지 유형으로 분석! 폭풍답장러? 읽씹마스터? 당신의 말투 유형은?',
+    href: CHATTYPE_URL,
+    isNew: true,
+    gradient: 'bg-gradient-to-br from-fuchsia-500 to-purple-500',
+    icon: (
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: 'balance',
+    title: '밸런스게임 생성기',
+    description: '대화 기반 맞춤 밸런스게임 자동 생성! 친구의 취향을 맞춰보세요.',
+    href: BALANCE_URL,
+    isNew: true,
+    gradient: 'bg-gradient-to-br from-amber-500 to-orange-500',
+    icon: (
+      <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export function ServiceGrid() {
@@ -124,7 +200,6 @@ export function ServiceGrid() {
               icon={service.icon}
               href={service.href}
               isNew={service.isNew}
-              isComingSoon={service.isComingSoon}
               gradient={service.gradient}
             />
           ))}
