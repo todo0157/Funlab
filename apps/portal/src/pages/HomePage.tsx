@@ -1,6 +1,5 @@
 import { HeroSection } from '../components/home/HeroSection';
 import { ServiceGrid } from '../components/home/ServiceGrid';
-import { AdBanner } from '../components/layout/AdBanner';
 
 export function HomePage() {
   return (
@@ -8,25 +7,21 @@ export function HomePage() {
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Ad Banner - Leaderboard */}
-      <AdBanner type="leaderboard" className="py-4 bg-gray-100 dark:bg-gray-800/50" />
-
       {/* Service Grid */}
       <ServiceGrid />
 
-      {/* Ad Section with Rectangle */}
+      {/* Feature Section */}
       <section className="py-8 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row items-center justify-center gap-8">
-            {/* Feature highlight */}
-            <div className="flex-1 max-w-lg text-center lg:text-left">
+          <div className="flex flex-col items-center justify-center">
+            <div className="max-w-lg text-center">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
                 더 많은 서비스가 준비중이에요
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
                 새로운 분석 서비스가 곧 출시됩니다. 이메일을 등록하시면 새 서비스 출시 소식을 가장 먼저 받아보실 수 있어요.
               </p>
-              <form className="flex gap-2 max-w-md mx-auto lg:mx-0">
+              <form className="flex gap-2 max-w-md mx-auto">
                 <input
                   type="email"
                   placeholder="이메일 주소"
@@ -40,17 +35,9 @@ export function HomePage() {
                 </button>
               </form>
             </div>
-
-            {/* Ad Rectangle */}
-            <div className="flex-shrink-0">
-              <AdBanner type="rectangle" />
-            </div>
           </div>
         </div>
       </section>
-
-      {/* Ad Banner - Leaderboard (Bottom) */}
-      <AdBanner type="leaderboard" className="py-4 bg-gray-100 dark:bg-gray-800/50" />
     </>
   );
 }
