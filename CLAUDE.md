@@ -112,7 +112,7 @@ VITE_API_URL=http://localhost:8787
 1. `git push origin main` → Cloudflare Pages 자동 빌드
 2. `cd workers/api-proxy && npx wrangler deploy` → Workers 배포
 
-## 현재 작업 상태 (2026-02-20)
+## 현재 작업 상태 (2026-02-23)
 
 ### 완료된 작업
 - ✅ iOS/Android 카카오톡 내보내기 파싱 지원 추가 (katalk, menhera, mbti 모두)
@@ -124,6 +124,30 @@ VITE_API_URL=http://localhost:8787
 - ✅ 말투 유형 테스트 구현 완료 (`apps/chattype-analyzer/`)
 - ✅ 밸런스게임 생성기 구현 완료 (`apps/balance-analyzer/`)
 - ✅ 드라마 캐릭터 분석기 구현 완료 (`apps/character-analyzer/`)
+- ✅ Google AdSense 승인용 필수 페이지 추가 (2026-02-23)
+
+### Google AdSense 승인용 페이지 추가 (2026-02-23)
+
+**추가된 페이지:**
+- `/privacy` - 개인정보처리방침 (8개 섹션)
+- `/terms` - 이용약관 (10개 조항)
+- `/about` - 서비스 소개, 사용법, 개인정보 보호 설명
+- `/contact` - 문의 폼 + FAQ 6개
+
+**수정된 파일:**
+- `apps/portal/src/App.tsx` - react-router-dom 라우터 추가
+- `apps/portal/src/components/layout/Header.tsx` - 네비게이션 메뉴 추가 (홈/소개/문의)
+- `apps/portal/src/components/layout/Footer.tsx` - 4열 구조, Link 컴포넌트 사용
+- `apps/portal/src/components/home/HeroSection.tsx` - 허위 통계 제거 → 실제 기능 표시
+- `apps/portal/index.html` - SEO 메타 태그, Open Graph, 구조화된 데이터 추가
+
+**SEO 관련 파일:**
+- `apps/portal/public/robots.txt` - 크롤러 허용 설정
+- `apps/portal/public/sitemap.xml` - 15개 페이지 URL 포함
+- `apps/portal/public/_redirects` - SPA 라우팅 지원
+
+**연락처:**
+- 문의 이메일: thf5662@gmail.com
 
 ### 연인 모의고사 (`apps/mockexam-analyzer/`) - 완료
 

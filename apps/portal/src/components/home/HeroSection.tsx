@@ -62,19 +62,19 @@ export function HeroSection() {
             </a>
           </div>
 
-          {/* Stats */}
+          {/* Features */}
           <div className="pt-8 flex flex-wrap justify-center gap-8 lg:gap-16">
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">10K+</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">분석 완료</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">10+</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">분석 서비스</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">98%</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">만족도</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">AI</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">GPT-4 기반</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900 dark:text-white">3초</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">분석 시간</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white">Free</div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">무료 이용</div>
             </div>
           </div>
         </div>
